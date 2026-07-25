@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+
+# Environment variables
+.env
+
+# Node
+node_modules/
+dist/
+
+# Java
+target/
+
+# Logs
+*.log
