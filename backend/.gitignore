@@ -4,6 +4,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 .env
+backend/uploads/
 
 ### STS ###
 .apt_generated
