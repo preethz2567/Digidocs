@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.*;
+
 @Getter
 @Setter
 @Entity
@@ -26,4 +28,8 @@ public class User {
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "user",orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<Document> documents = new ArrayList<>();
 }

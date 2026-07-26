@@ -23,32 +23,41 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
+protected void doFilterInternal(HttpServletRequest request,
+                                HttpServletResponse response,
+                                FilterChain filterChain)
+        throws ServletException, IOException {
 
-        String header = request.getHeader("Authorization");
+    System.out.println("URI = " + request.getRequestURI());
 
-        if (header != null && header.startsWith("Bearer ")) {
+    String header = request.getHeader("Authorization");
+    System.out.println("HEADER = " + header);
 
-            String token = header.substring(7);
+    if (header != null && header.startsWith("Bearer ")) {
 
-            if (jwtService.isTokenValid(token)) {
+        String token = header.substring(7);
 
-                String email = jwtService.extractEmail(token);
+        try {
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                email,
-                                null,
-                                AuthorityUtils.NO_AUTHORITIES
-                        );
+            String email = jwtService.extractEmail(token);
+            System.out.println("EMAIL = " + email);
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            email,
+                            null,
+                            AuthorityUtils.NO_AUTHORITIES
+                    );
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            System.out.println("AUTHENTICATION SET");
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        filterChain.doFilter(request, response);
     }
+
+    filterChain.doFilter(request, response);
+}
 }
