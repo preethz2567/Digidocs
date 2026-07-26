@@ -1,4 +1,5 @@
 package com.builds.digidocs.service.impl;
+import java.util.*;
 
 import com.builds.digidocs.dto.DocumentResponse;
 import com.builds.digidocs.entity.Document;
@@ -78,4 +79,22 @@ public class DocumentServiceImpl implements DocumentService {
             throw new RuntimeException("File upload failed");
         }
     }
+
+    @Override
+public List<DocumentResponse> getDocuments(String email) {
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    return documentRepository.findByUser(user)
+            .stream()
+            .map(document -> new DocumentResponse(
+                    document.getId(),
+                    document.getOriginalFileName(),
+                    document.getFileSize(),
+                    document.getContentType(),
+                    document.getUploadedAt()
+            ))
+            .toList();
+}
 }

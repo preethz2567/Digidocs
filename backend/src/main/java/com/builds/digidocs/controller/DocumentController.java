@@ -5,6 +5,7 @@ import com.builds.digidocs.security.JwtService;
 import com.builds.digidocs.service.DocumentService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/documents")
@@ -17,6 +18,13 @@ public class DocumentController {
                               JwtService jwtService) {
         this.documentService = documentService;
         this.jwtService = jwtService;
+    }
+
+    @GetMapping
+    public List<DocumentResponse> getDocuments(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        String email = jwtService.extractEmail(token);
+        return documentService.getDocuments(email);
     }
 
     @PostMapping("/upload")
