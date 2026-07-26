@@ -64,5 +64,19 @@ public ResponseEntity<Resource> downloadDocument(
             .body(response.getResource());
 }
 
+@DeleteMapping("/{id}")
+public ResponseEntity<String> deleteDocument(
+        @PathVariable Long id,
+        @RequestHeader("Authorization") String authHeader) {
+
+    String token = authHeader.substring(7);
+
+    String email = jwtService.extractEmail(token);
+
+    documentService.deleteDocument(id, email);
+
+    return ResponseEntity.ok("Document deleted successfully");
+}
+
 
 }

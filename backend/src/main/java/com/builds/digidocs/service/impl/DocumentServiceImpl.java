@@ -129,4 +129,27 @@ public DocumentDownloadResponse downloadDocument(Long id, String email) {
         throw new RuntimeException("Unable to read file");
     }
 }
+
+@Override
+public void deleteDocument(Long id, String email) {
+
+    try {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Document document = documentRepository
+                .findByIdAndUser(id, user)
+                .orElseThrow(() -> new RuntimeException("Document not found"));
+
+        Path path = Paths.get(document.getFilePath());
+
+        Files.deleteIfExists(path);
+
+        documentRepository.delete(document);
+
+    } catch (IOException e) {
+        throw new RuntimeException("Failed to delete document");
+    }
+}
 }
