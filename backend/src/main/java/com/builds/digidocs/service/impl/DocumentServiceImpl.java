@@ -1,6 +1,7 @@
 package com.builds.digidocs.service.impl;
 import java.util.*;
 
+import com.builds.digidocs.dto.DocumentDownloadResponse;
 import com.builds.digidocs.dto.DocumentResponse;
 import com.builds.digidocs.entity.Document;
 import com.builds.digidocs.entity.User;
@@ -11,13 +12,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Service
 public class DocumentServiceImpl implements DocumentService {
@@ -96,5 +98,35 @@ public List<DocumentResponse> getDocuments(String email) {
                     document.getUploadedAt()
             ))
             .toList();
+}
+
+@Override
+public DocumentDownloadResponse downloadDocument(Long id, String email) {
+
+    try {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Document document = documentRepository
+                .findByIdAndUser(id, user)
+                .orElseThrow(() -> new RuntimeException("Document not found"));
+
+        Path path = Paths.get(document.getFilePath());
+
+        Resource resource = new UrlResource(path.toUri());
+
+        if (!resource.exists() || !resource.isReadable()) {
+            throw new RuntimeException("File not found");
+        }
+
+        return new DocumentDownloadResponse(
+                resource,
+                document.getOriginalFileName()
+        );
+
+    } catch (IOException e) {
+        throw new RuntimeException("Unable to read file");
+    }
 }
 }
