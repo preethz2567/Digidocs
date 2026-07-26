@@ -3,8 +3,13 @@ package com.builds.digidocs.controller;
 import com.builds.digidocs.dto.DocumentResponse;
 import com.builds.digidocs.security.JwtService;
 import com.builds.digidocs.service.DocumentService;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import com.builds.digidocs.dto.DocumentDownloadResponse;
 import java.util.List;
 
 @RestController
@@ -37,4 +42,27 @@ public class DocumentController {
 
         return documentService.uploadDocument(file, email);
     }
+
+    @GetMapping("/{id}")
+public ResponseEntity<Resource> downloadDocument(
+        @PathVariable Long id,
+        @RequestHeader("Authorization") String authHeader) {
+
+    String token = authHeader.substring(7);
+
+    String email = jwtService.extractEmail(token);
+
+    DocumentDownloadResponse response =
+            documentService.downloadDocument(id, email);
+
+    return ResponseEntity.ok()
+            .header(
+                    HttpHeaders.CONTENT_DISPOSITION,
+                    "attachment; filename=\"" +
+                            response.getOriginalFileName() + "\""
+            )
+            .body(response.getResource());
+}
+
+
 }
