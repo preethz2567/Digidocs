@@ -1,32 +1,38 @@
 package com.builds.digidocs.service.impl;
-import java.util.*;
-
-import com.builds.digidocs.dto.DocumentDownloadResponse;
-import com.builds.digidocs.dto.DocumentResponse;
-import com.builds.digidocs.dto.ShareResponse;
-import com.builds.digidocs.entity.Document;
-import com.builds.digidocs.entity.User;
-import com.builds.digidocs.repository.DocumentRepository;
-import com.builds.digidocs.repository.UserRepository;
-import com.builds.digidocs.service.DocumentService;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.builds.digidocs.dto.DocumentDownloadResponse;
+import com.builds.digidocs.dto.DocumentResponse;
+import com.builds.digidocs.dto.ShareResponse;
+import com.builds.digidocs.entity.Document;
+import com.builds.digidocs.entity.User;
 import com.builds.digidocs.exception.DocumentNotFoundException;
 import com.builds.digidocs.exception.UnauthorizedException;
 import com.builds.digidocs.exception.UserNotFoundException;
+import com.builds.digidocs.repository.DocumentRepository;
+import com.builds.digidocs.repository.UserRepository;
+import com.builds.digidocs.service.DocumentService;
 
 @Service
 public class DocumentServiceImpl implements DocumentService {
+
+    private static final Logger logger =
+    LoggerFactory.getLogger(DocumentServiceImpl.class);
 
     private final DocumentRepository documentRepository;
     private final UserRepository userRepository;
@@ -72,6 +78,9 @@ public class DocumentServiceImpl implements DocumentService {
             document.setUser(user);
 
             Document saved = documentRepository.save(document);
+            logger.info("Document uploaded: {} by {}",
+            saved.getOriginalFileName(),
+            email);
 
             return new DocumentResponse(
                     saved.getId(),
@@ -82,6 +91,7 @@ public class DocumentServiceImpl implements DocumentService {
             );
 
         } catch (IOException e) {
+            logger.error("File upload failed", e);
             throw new RuntimeException("File upload failed");
         }
     }
@@ -123,12 +133,17 @@ public DocumentDownloadResponse downloadDocument(Long id, String email) {
             throw new RuntimeException("File not found");
         }
 
+        logger.info("Document downloaded: {} by {}",
+        document.getOriginalFileName(),
+        email);
+
         return new DocumentDownloadResponse(
                 resource,
                 document.getOriginalFileName()
         );
 
     } catch (IOException e) {
+        logger.error("Unable to read file", e);
         throw new RuntimeException("Unable to read file");
     }
 }
@@ -148,10 +163,14 @@ public void deleteDocument(Long id, String email) {
         Path path = Paths.get(document.getFilePath());
 
         Files.deleteIfExists(path);
+        logger.info("Document deleted: {} by {}",
+        document.getOriginalFileName(),
+        email);
 
         documentRepository.delete(document);
 
     } catch (IOException e) {
+        logger.error("Failed to delete document", e);
         throw new RuntimeException("Failed to delete document");
     }
 }
@@ -191,6 +210,9 @@ public DocumentResponse renameDocument(Long id, String email, String newName) {
     document.setOriginalFileName(newName);
 
     Document saved = documentRepository.save(document);
+    logger.info("Document renamed to {} by {}",
+        saved.getOriginalFileName(),
+        email);
 
     return new DocumentResponse(
             saved.getId(),
@@ -213,6 +235,10 @@ public DocumentResponse getDocument(Long id, String email) {
     if (!document.getUser().getId().equals(user.getId())) {
         throw new UnauthorizedException("Access denied");
     }
+
+    logger.info("Metadata viewed for document {} by {}",
+        document.getId(),
+        email);
 
     return new DocumentResponse(
             document.getId(),
@@ -241,6 +267,9 @@ public ShareResponse shareDocument(Long id, String email) {
         documentRepository.save(document);
     }
 
+    logger.info("Share link generated for document {} by {}",
+        document.getId(),
+        email);
     return new ShareResponse(document.getShareToken());
 }
 
@@ -257,7 +286,9 @@ public DocumentDownloadResponse downloadSharedDocument(String shareToken) {
     } catch (MalformedURLException e) {
         throw new RuntimeException("File not found");
     }
-
+    
+    logger.info("Shared document downloaded: {}",
+        document.getOriginalFileName());
     return new DocumentDownloadResponse(
             resource,
             document.getOriginalFileName()
