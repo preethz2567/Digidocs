@@ -3,6 +3,7 @@ package com.builds.digidocs.controller;
 import com.builds.digidocs.dto.ProfileResponse;
 import com.builds.digidocs.dto.RegisterRequest;
 import com.builds.digidocs.dto.RegisterResponse;
+import com.builds.digidocs.dto.UpdateProfileRequest;
 import com.builds.digidocs.security.JwtService;
 import com.builds.digidocs.service.UserService;
 import jakarta.validation.Valid;
@@ -34,4 +35,15 @@ public class UserController {
 
         return service.getProfile(email);
     }
+
+    @PutMapping("/me")
+    public ProfileResponse updateProfile(
+            @RequestBody UpdateProfileRequest request,
+            @RequestHeader("Authorization") String authHeader) {
+
+        String token = authHeader.substring(7);
+        String email = jwtService.extractEmail(token);
+
+        return service.updateProfile(email, request);
+}
 }
