@@ -1,6 +1,7 @@
 package com.builds.digidocs.controller;
 
 import com.builds.digidocs.dto.DocumentResponse;
+import com.builds.digidocs.dto.RenameDocumentRequest;
 import com.builds.digidocs.security.JwtService;
 import com.builds.digidocs.service.DocumentService;
 
@@ -89,6 +90,23 @@ public List<DocumentResponse> searchDocuments(
     String email = jwtService.extractEmail(token);
 
     return documentService.searchDocuments(email, keyword);
+}
+
+@PutMapping("/{id}")
+public DocumentResponse renameDocument(
+        @PathVariable Long id,
+        @RequestBody RenameDocumentRequest request,
+        @RequestHeader("Authorization") String authHeader) {
+
+    String token = authHeader.substring(7);
+
+    String email = jwtService.extractEmail(token);
+
+    return documentService.renameDocument(
+            id,
+            email,
+            request.getOriginalFileName()
+    );
 }
 
 }
