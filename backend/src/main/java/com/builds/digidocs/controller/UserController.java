@@ -1,5 +1,6 @@
 package com.builds.digidocs.controller;
 
+import com.builds.digidocs.dto.ChangePasswordRequest;
 import com.builds.digidocs.dto.ProfileResponse;
 import com.builds.digidocs.dto.RegisterRequest;
 import com.builds.digidocs.dto.RegisterResponse;
@@ -34,4 +35,18 @@ public class UserController {
 
         return service.getProfile(email);
     }
+
+    @PutMapping("/change-password")
+    public String changePassword(
+            @RequestBody ChangePasswordRequest request,
+            @RequestHeader("Authorization") String authHeader) {
+
+        String token = authHeader.substring(7);
+
+        String email = jwtService.extractEmail(token);
+
+        service.changePassword(email, request);
+
+        return "Password changed successfully";
+}
 }

@@ -2,6 +2,7 @@ package com.builds.digidocs.service.impl;
 
 import com.builds.digidocs.dto.RegisterRequest;
 import com.builds.digidocs.dto.RegisterResponse;
+import com.builds.digidocs.dto.ChangePasswordRequest;
 import com.builds.digidocs.dto.LoginRequest;
 import com.builds.digidocs.dto.LoginResponse;
 import com.builds.digidocs.dto.ProfileResponse;
@@ -12,6 +13,7 @@ import com.builds.digidocs.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.builds.digidocs.dto.ChangePasswordRequest;
 
 import java.time.LocalDateTime;
 
@@ -81,5 +83,25 @@ public ProfileResponse getProfile(String email) {
             user.getName(),
             user.getEmail()
     );
+}
+
+@Override
+public void changePassword(String email, ChangePasswordRequest request) {
+
+    User user = repository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    if (!encoder.matches(
+            request.getCurrentPassword(),
+            user.getPassword())) {
+
+        throw new RuntimeException("Current password is incorrect");
+    }
+
+    user.setPassword(
+            encoder.encode(request.getNewPassword())
+    );
+
+    repository.save(user);
 }
 }
