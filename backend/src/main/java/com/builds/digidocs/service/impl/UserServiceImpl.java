@@ -1,21 +1,24 @@
 package com.builds.digidocs.service.impl;
 
-import com.builds.digidocs.dto.RegisterRequest;
-import com.builds.digidocs.dto.RegisterResponse;
+import java.time.LocalDateTime;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.builds.digidocs.dto.ChangePasswordRequest;
 import com.builds.digidocs.dto.LoginRequest;
 import com.builds.digidocs.dto.LoginResponse;
 import com.builds.digidocs.dto.ProfileResponse;
+import com.builds.digidocs.dto.RegisterRequest;
+import com.builds.digidocs.dto.RegisterResponse;
 import com.builds.digidocs.entity.User;
+import com.builds.digidocs.exception.UnauthorizedException;
+import com.builds.digidocs.exception.UserNotFoundException;
 import com.builds.digidocs.repository.UserRepository;
 import com.builds.digidocs.security.JwtService;
 import com.builds.digidocs.service.UserService;
-import com.builds.digidocs.exception.UserNotFoundException;
-import com.builds.digidocs.exception.UnauthorizedException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -23,6 +26,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository repository;
 
     private final JwtService jwtService;
+    private static final Logger logger =
+        LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final BCryptPasswordEncoder encoder;
 
@@ -49,6 +54,8 @@ public class UserServiceImpl implements UserService {
         user.setCreatedAt(LocalDateTime.now());
 
         User saved = repository.save(user);
+        
+        logger.info("User registered: {}", saved.getEmail());
 
         return new RegisterResponse(
                 saved.getId(),
@@ -68,6 +75,8 @@ public LoginResponse login(LoginRequest request) {
     }
 
     String token = jwtService.generateToken(user.getEmail());
+
+    logger.info("User logged in: {}", user.getEmail());
 
     return new LoginResponse(token);
 }
@@ -103,5 +112,6 @@ public void changePassword(String email, ChangePasswordRequest request) {
     );
 
     repository.save(user);
+    logger.info("Password changed for user: {}", user.getEmail());
 }
 }
