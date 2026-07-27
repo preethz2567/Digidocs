@@ -171,4 +171,52 @@ public List<DocumentResponse> searchDocuments(String email, String keyword) {
             ))
             .toList();
 }
+
+@Override
+public DocumentResponse renameDocument(Long id, String email, String newName) {
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    Document document = documentRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Document not found"));
+
+    if (!document.getUser().getId().equals(user.getId())) {
+        throw new RuntimeException("Access denied");
+    }
+
+    document.setOriginalFileName(newName);
+
+    Document saved = documentRepository.save(document);
+
+    return new DocumentResponse(
+            saved.getId(),
+            saved.getOriginalFileName(),
+            saved.getFileSize(),
+            saved.getContentType(),
+            saved.getUploadedAt()
+    );
+}
+
+@Override
+public DocumentResponse getDocument(Long id, String email) {
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    Document document = documentRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Document not found"));
+
+    if (!document.getUser().getId().equals(user.getId())) {
+        throw new RuntimeException("Access denied");
+    }
+
+    return new DocumentResponse(
+            document.getId(),
+            document.getOriginalFileName(),
+            document.getFileSize(),
+            document.getContentType(),
+            document.getUploadedAt()
+    );
+}
 }
