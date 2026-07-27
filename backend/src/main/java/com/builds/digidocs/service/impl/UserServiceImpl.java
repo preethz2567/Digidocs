@@ -2,6 +2,7 @@ package com.builds.digidocs.service.impl;
 
 import com.builds.digidocs.dto.RegisterRequest;
 import com.builds.digidocs.dto.RegisterResponse;
+import com.builds.digidocs.dto.UpdateProfileRequest;
 import com.builds.digidocs.dto.LoginRequest;
 import com.builds.digidocs.dto.LoginResponse;
 import com.builds.digidocs.dto.ProfileResponse;
@@ -80,6 +81,22 @@ public ProfileResponse getProfile(String email) {
             user.getId(),
             user.getName(),
             user.getEmail()
+    );
+}
+@Override
+public ProfileResponse updateProfile(String email, UpdateProfileRequest request) {
+
+    User user = repository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    user.setName(request.getName());
+
+    User saved = repository.save(user);
+
+    return new ProfileResponse(
+            saved.getId(),
+            saved.getName(),
+            saved.getEmail()
     );
 }
 }
