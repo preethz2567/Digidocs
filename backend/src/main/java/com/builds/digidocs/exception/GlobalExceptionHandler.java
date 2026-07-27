@@ -94,4 +94,17 @@ public ResponseEntity<Map<String, Object>> handleUnauthorized(
                     "error", ex.getMessage()
             ));
 }
+
+@ExceptionHandler(InvalidRequestException.class)
+public ResponseEntity<Map<String, Object>> handleInvalidRequest(
+        InvalidRequestException ex) {
+
+    return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(Map.of(
+                    "timestamp", LocalDateTime.now(),
+                    "status", 400,
+                    "error", ex.getMessage()
+            ));
+}
 }
