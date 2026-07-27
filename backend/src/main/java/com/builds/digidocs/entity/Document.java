@@ -37,6 +37,17 @@ public class Document {
     @Column(unique = true)
     private String shareToken;
 
+    @Column
+    private LocalDateTime shareExpiry;
+
+    public LocalDateTime getShareExpiry() {
+        return shareExpiry;
+    }
+
+    public void setShareExpiry(LocalDateTime shareExpiry) {
+        this.shareExpiry = shareExpiry;
+    }
+
     public Long getId() {
         return id;
     }

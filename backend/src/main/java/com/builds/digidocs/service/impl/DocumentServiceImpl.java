@@ -280,10 +280,15 @@ public ShareResponse shareDocument(Long id, String email) {
         throw new UnauthorizedException("Access denied");
     }
 
-    if (document.getShareToken() == null) {
-        document.setShareToken(UUID.randomUUID().toString());
-        documentRepository.save(document);
-    }
+    if (document.getShareToken() == null ||
+        document.getShareExpiry() == null ||
+        document.getShareExpiry().isBefore(LocalDateTime.now())) {
+
+    document.setShareToken(UUID.randomUUID().toString());
+    document.setShareExpiry(LocalDateTime.now().plusDays(7));
+
+    documentRepository.save(document);
+}
 
     logger.info("Share link generated for document {} by {}",
         document.getId(),
@@ -296,6 +301,12 @@ public DocumentDownloadResponse downloadSharedDocument(String shareToken) {
 
     Document document = documentRepository.findByShareToken(shareToken)
             .orElseThrow(() -> new DocumentNotFoundException("Shared document not found"));
+
+    if (document.getShareExpiry() == null ||
+        document.getShareExpiry().isBefore(LocalDateTime.now())) {
+
+    throw new RuntimeException("Share link has expired");
+}
 
     Resource resource;
 
