@@ -30,11 +30,15 @@ public class DocumentController {
     }
 
     @GetMapping
-    public List<DocumentResponse> getDocuments(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.substring(7);
-        String email = jwtService.extractEmail(token);
-        return documentService.getDocuments(email);
-    }
+    public List<DocumentResponse> getDocuments(
+        @RequestParam(defaultValue = "date") String sort,
+        @RequestHeader("Authorization") String authHeader) {
+
+    String token = authHeader.substring(7);
+    String email = jwtService.extractEmail(token);
+
+    return documentService.getDocuments(email, sort);
+}
 
     @PostMapping("/upload")
     public DocumentResponse uploadDocument(

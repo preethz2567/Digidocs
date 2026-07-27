@@ -13,7 +13,7 @@ public interface DocumentService {
 
     DocumentResponse uploadDocument(MultipartFile file, String email);
 
-    List<DocumentResponse> getDocuments(String email);
+    List<DocumentResponse> getDocuments(String email, String sort);
     DocumentDownloadResponse downloadDocument(Long id, String email);
     void deleteDocument(Long id, String email);
     List<DocumentResponse> searchDocuments(String email, String keyword);
