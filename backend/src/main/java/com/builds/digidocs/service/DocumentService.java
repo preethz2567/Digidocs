@@ -21,4 +21,5 @@ public interface DocumentService {
     DocumentResponse getDocument(Long id, String email);
     ShareResponse shareDocument(Long id, String email);
     DocumentDownloadResponse downloadSharedDocument(String shareToken);
+    void revokeShare(Long id, String email);
 }

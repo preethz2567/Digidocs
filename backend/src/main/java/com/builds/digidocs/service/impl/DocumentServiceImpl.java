@@ -323,4 +323,27 @@ public DocumentDownloadResponse downloadSharedDocument(String shareToken) {
             document.getOriginalFileName()
     );
 }
+
+@Override
+public void revokeShare(Long id, String email) {
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    Document document = documentRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Document not found"));
+
+    if (!document.getUser().getId().equals(user.getId())) {
+        throw new RuntimeException("Access denied");
+    }
+
+    document.setShareToken(null);
+    document.setShareExpiry(null);
+
+    documentRepository.save(document);
+
+    logger.info("Share link revoked for document {} by {}",
+            document.getId(),
+            email);
+}
 }
