@@ -21,6 +21,7 @@ import com.builds.digidocs.dto.DocumentResponse;
 import com.builds.digidocs.dto.ShareResponse;
 import com.builds.digidocs.entity.Document;
 import com.builds.digidocs.entity.User;
+import org.springframework.data.domain.Sort;
 import com.builds.digidocs.exception.DocumentNotFoundException;
 import com.builds.digidocs.exception.UnauthorizedException;
 import com.builds.digidocs.exception.UserNotFoundException;
@@ -28,6 +29,7 @@ import com.builds.digidocs.exception.InvalidRequestException;
 import com.builds.digidocs.repository.DocumentRepository;
 import com.builds.digidocs.repository.UserRepository;
 import com.builds.digidocs.service.DocumentService;
+
 
 @Service
 public class DocumentServiceImpl implements DocumentService {
@@ -114,13 +116,30 @@ if (!allowedTypes.contains(file.getContentType())) {
         }
     }
 
-    @Override
-public List<DocumentResponse> getDocuments(String email) {
+@Override
+public List<DocumentResponse> getDocuments(String email, String sort) {
 
     User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new UserNotFoundException("User not found"));
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
-    return documentRepository.findByUser(user)
+    Sort sorting;
+
+    switch (sort.toLowerCase()) {
+        case "name":
+            sorting = Sort.by("originalFileName").ascending();
+            break;
+
+        case "size":
+            sorting = Sort.by("fileSize").descending();
+            break;
+
+        case "date":
+        default:
+            sorting = Sort.by("uploadedAt").descending();
+            break;
+    }
+
+    return documentRepository.findByUser(user, sorting)
             .stream()
             .map(document -> new DocumentResponse(
                     document.getId(),
