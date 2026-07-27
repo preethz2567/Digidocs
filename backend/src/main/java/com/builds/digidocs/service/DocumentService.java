@@ -14,4 +14,5 @@ public interface DocumentService {
     List<DocumentResponse> getDocuments(String email);
     DocumentDownloadResponse downloadDocument(Long id, String email);
     void deleteDocument(Long id, String email);
+    List<DocumentResponse> searchDocuments(String email, String keyword);
 }

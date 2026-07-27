@@ -12,4 +12,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     List<Document> findByUser(User user);
     
     Optional<Document> findByIdAndUser(Long id, User user);
+    
+    List<Document> findByUserAndOriginalFileNameContainingIgnoreCase(User user, String keyword);
+
 }

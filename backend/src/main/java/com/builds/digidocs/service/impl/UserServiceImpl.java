@@ -4,6 +4,7 @@ import com.builds.digidocs.dto.RegisterRequest;
 import com.builds.digidocs.dto.RegisterResponse;
 import com.builds.digidocs.dto.LoginRequest;
 import com.builds.digidocs.dto.LoginResponse;
+import com.builds.digidocs.dto.ProfileResponse;
 import com.builds.digidocs.entity.User;
 import com.builds.digidocs.repository.UserRepository;
 import com.builds.digidocs.security.JwtService;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 
 @Service
-@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository repository;
@@ -23,6 +23,14 @@ public class UserServiceImpl implements UserService {
     private final JwtService jwtService;
 
     private final BCryptPasswordEncoder encoder;
+
+    public UserServiceImpl(UserRepository repository,
+                       JwtService jwtService,
+                       BCryptPasswordEncoder encoder) {
+    this.repository = repository;
+    this.jwtService = jwtService;
+    this.encoder = encoder;
+}
 
     @Override
     public RegisterResponse register(RegisterRequest request) {
@@ -60,5 +68,18 @@ public LoginResponse login(LoginRequest request) {
     String token = jwtService.generateToken(user.getEmail());
 
     return new LoginResponse(token);
+}
+
+@Override
+public ProfileResponse getProfile(String email) {
+
+    User user = repository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    return new ProfileResponse(
+            user.getId(),
+            user.getName(),
+            user.getEmail()
+    );
 }
 }

@@ -152,4 +152,23 @@ public void deleteDocument(Long id, String email) {
         throw new RuntimeException("Failed to delete document");
     }
 }
+
+@Override
+public List<DocumentResponse> searchDocuments(String email, String keyword) {
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    return documentRepository
+            .findByUserAndOriginalFileNameContainingIgnoreCase(user, keyword)
+            .stream()
+            .map(document -> new DocumentResponse(
+                    document.getId(),
+                    document.getOriginalFileName(),
+                    document.getFileSize(),
+                    document.getContentType(),
+                    document.getUploadedAt()
+            ))
+            .toList();
+}
 }
