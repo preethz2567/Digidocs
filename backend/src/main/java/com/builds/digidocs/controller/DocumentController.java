@@ -135,4 +135,17 @@ public ShareResponse shareDocument(
     return documentService.shareDocument(id, email);
 }
 
+@DeleteMapping("/{id}/share")
+public ResponseEntity<String> revokeShare(
+        @PathVariable Long id,
+        @RequestHeader("Authorization") String authHeader) {
+
+    String token = authHeader.substring(7);
+    String email = jwtService.extractEmail(token);
+
+    documentService.revokeShare(id, email);
+
+    return ResponseEntity.ok("Share link revoked successfully");
+}
+
 }
