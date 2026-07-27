@@ -15,4 +15,6 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     
     List<Document> findByUserAndOriginalFileNameContainingIgnoreCase(User user, String keyword);
 
+    Optional<Document> findByShareToken(String shareToken);
+
 }

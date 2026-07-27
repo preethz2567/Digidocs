@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import com.builds.digidocs.dto.DocumentDownloadResponse;
+import com.builds.digidocs.dto.ShareResponse;
 import java.util.List;
 
 @RestController
@@ -118,6 +119,18 @@ public DocumentResponse getDocument(
     String email = jwtService.extractEmail(token);
 
     return documentService.getDocument(id, email);
+}
+
+@PostMapping("/{id}/share")
+public ShareResponse shareDocument(
+        @PathVariable Long id,
+        @RequestHeader("Authorization") String authHeader) {
+
+    String token = authHeader.substring(7);
+
+    String email = jwtService.extractEmail(token);
+
+    return documentService.shareDocument(id, email);
 }
 
 }

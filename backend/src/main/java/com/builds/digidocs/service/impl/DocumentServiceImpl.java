@@ -3,12 +3,12 @@ import java.util.*;
 
 import com.builds.digidocs.dto.DocumentDownloadResponse;
 import com.builds.digidocs.dto.DocumentResponse;
+import com.builds.digidocs.dto.ShareResponse;
 import com.builds.digidocs.entity.Document;
 import com.builds.digidocs.entity.User;
 import com.builds.digidocs.repository.DocumentRepository;
 import com.builds.digidocs.repository.UserRepository;
 import com.builds.digidocs.service.DocumentService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +16,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -217,6 +218,47 @@ public DocumentResponse getDocument(Long id, String email) {
             document.getFileSize(),
             document.getContentType(),
             document.getUploadedAt()
+    );
+}
+
+@Override
+public ShareResponse shareDocument(Long id, String email) {
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    Document document = documentRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Document not found"));
+
+    if (!document.getUser().getId().equals(user.getId())) {
+        throw new RuntimeException("Access denied");
+    }
+
+    if (document.getShareToken() == null) {
+        document.setShareToken(UUID.randomUUID().toString());
+        documentRepository.save(document);
+    }
+
+    return new ShareResponse(document.getShareToken());
+}
+
+@Override
+public DocumentDownloadResponse downloadSharedDocument(String shareToken) {
+
+    Document document = documentRepository.findByShareToken(shareToken)
+            .orElseThrow(() -> new RuntimeException("Shared document not found"));
+
+    Resource resource;
+
+    try {
+        resource = new UrlResource(Paths.get(document.getFilePath()).toUri());
+    } catch (MalformedURLException e) {
+        throw new RuntimeException("File not found");
+    }
+
+    return new DocumentDownloadResponse(
+            resource,
+            document.getOriginalFileName()
     );
 }
 }
