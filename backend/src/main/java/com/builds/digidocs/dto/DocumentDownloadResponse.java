@@ -1,12 +1,13 @@
 package com.builds.digidocs.dto;
 
-
 import org.springframework.core.io.Resource;
 
 public class DocumentDownloadResponse {
 
-    private final Resource resource;
-    private final String originalFileName;
+    private Resource resource;
+    private String originalFileName;
+
+    public DocumentDownloadResponse() {}
 
     public DocumentDownloadResponse(Resource resource, String originalFileName) {
         this.resource = resource;
@@ -17,7 +18,15 @@ public class DocumentDownloadResponse {
         return resource;
     }
 
+    public void setResource(Resource resource) {
+        this.resource = resource;
+    }
+
     public String getOriginalFileName() {
         return originalFileName;
+    }
+
+    public void setOriginalFileName(String originalFileName) {
+        this.originalFileName = originalFileName;
     }
 }

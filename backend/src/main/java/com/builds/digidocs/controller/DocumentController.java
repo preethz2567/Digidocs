@@ -79,4 +79,16 @@ public ResponseEntity<String> deleteDocument(
 }
 
 
+@GetMapping("/search")
+public List<DocumentResponse> searchDocuments(
+        @RequestParam String keyword,
+        @RequestHeader("Authorization") String authHeader) {
+
+    String token = authHeader.substring(7);
+
+    String email = jwtService.extractEmail(token);
+
+    return documentService.searchDocuments(email, keyword);
+}
+
 }
