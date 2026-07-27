@@ -10,10 +10,10 @@ import com.builds.digidocs.entity.User;
 import com.builds.digidocs.repository.UserRepository;
 import com.builds.digidocs.security.JwtService;
 import com.builds.digidocs.service.UserService;
-import lombok.RequiredArgsConstructor;
+import com.builds.digidocs.exception.UserNotFoundException;
+import com.builds.digidocs.exception.UnauthorizedException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.builds.digidocs.dto.ChangePasswordRequest;
 
 import java.time.LocalDateTime;
 
@@ -64,7 +64,7 @@ public LoginResponse login(LoginRequest request) {
             .orElseThrow(() -> new RuntimeException("Invalid email or password"));
 
     if (!encoder.matches(request.getPassword(), user.getPassword())) {
-        throw new RuntimeException("Invalid email or password");
+        throw new UnauthorizedException("Invalid email or password");
     }
 
     String token = jwtService.generateToken(user.getEmail());
@@ -76,7 +76,7 @@ public LoginResponse login(LoginRequest request) {
 public ProfileResponse getProfile(String email) {
 
     User user = repository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new UserNotFoundException("User not found"));
 
     return new ProfileResponse(
             user.getId(),
@@ -95,7 +95,7 @@ public void changePassword(String email, ChangePasswordRequest request) {
             request.getCurrentPassword(),
             user.getPassword())) {
 
-        throw new RuntimeException("Current password is incorrect");
+        throw new UnauthorizedException("Current password is incorrect");
     }
 
     user.setPassword(

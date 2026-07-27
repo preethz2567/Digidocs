@@ -5,6 +5,8 @@ import com.builds.digidocs.dto.RenameDocumentRequest;
 import com.builds.digidocs.security.JwtService;
 import com.builds.digidocs.service.DocumentService;
 
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -96,8 +98,8 @@ public List<DocumentResponse> searchDocuments(
 @PutMapping("/{id}")
 public DocumentResponse renameDocument(
         @PathVariable Long id,
-        @RequestBody RenameDocumentRequest request,
-        @RequestHeader("Authorization") String authHeader) {
+        @Valid @RequestBody RenameDocumentRequest request,
+        @RequestHeader("Authorization") String authHeader){
 
     String token = authHeader.substring(7);
 
@@ -106,7 +108,7 @@ public DocumentResponse renameDocument(
     return documentService.renameDocument(
             id,
             email,
-            request.getOriginalFileName()
+            request.getNewName()
     );
 }
 
