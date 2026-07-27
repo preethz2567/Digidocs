@@ -109,4 +109,15 @@ public DocumentResponse renameDocument(
     );
 }
 
+@GetMapping("/{id}/metadata")
+public DocumentResponse getDocument(
+        @PathVariable Long id,
+        @RequestHeader("Authorization") String authHeader) {
+
+    String token = authHeader.substring(7);
+    String email = jwtService.extractEmail(token);
+
+    return documentService.getDocument(id, email);
+}
+
 }

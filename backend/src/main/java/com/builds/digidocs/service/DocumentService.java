@@ -16,4 +16,5 @@ public interface DocumentService {
     void deleteDocument(Long id, String email);
     List<DocumentResponse> searchDocuments(String email, String keyword);
     DocumentResponse renameDocument(Long id, String email, String newName);
+    DocumentResponse getDocument(Long id, String email);
 }
