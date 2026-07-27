@@ -24,6 +24,7 @@ import com.builds.digidocs.entity.User;
 import com.builds.digidocs.exception.DocumentNotFoundException;
 import com.builds.digidocs.exception.UnauthorizedException;
 import com.builds.digidocs.exception.UserNotFoundException;
+import com.builds.digidocs.exception.InvalidRequestException;
 import com.builds.digidocs.repository.DocumentRepository;
 import com.builds.digidocs.repository.UserRepository;
 import com.builds.digidocs.service.DocumentService;
@@ -50,6 +51,23 @@ public class DocumentServiceImpl implements DocumentService {
     public DocumentResponse uploadDocument(MultipartFile file, String email) {
 
         try {
+
+            if (file.isEmpty()) {
+            throw new InvalidRequestException("File cannot be empty");
+             }
+             if (file.getSize() > 10 * 1024 * 1024) {
+             throw new InvalidRequestException("Maximum file size is 10 MB");
+            }
+            List<String> allowedTypes = List.of(
+            "application/pdf",
+            "image/png",
+            "image/jpeg",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+);
+
+if (!allowedTypes.contains(file.getContentType())) {
+    throw new InvalidRequestException("Unsupported file type");
+}
 
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new UserNotFoundException("User not found"));
