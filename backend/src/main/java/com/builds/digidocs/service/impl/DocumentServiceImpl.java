@@ -21,6 +21,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import com.builds.digidocs.exception.DocumentNotFoundException;
+import com.builds.digidocs.exception.UnauthorizedException;
+import com.builds.digidocs.exception.UserNotFoundException;
 
 @Service
 public class DocumentServiceImpl implements DocumentService {
@@ -43,7 +46,7 @@ public class DocumentServiceImpl implements DocumentService {
         try {
 
             User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+                    .orElseThrow(() -> new UserNotFoundException("User not found"));
 
             String storedFileName =
                     UUID.randomUUID() + "_" + file.getOriginalFilename();
@@ -87,7 +90,7 @@ public class DocumentServiceImpl implements DocumentService {
 public List<DocumentResponse> getDocuments(String email) {
 
     User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new UserNotFoundException("User not found"));
 
     return documentRepository.findByUser(user)
             .stream()
@@ -107,11 +110,10 @@ public DocumentDownloadResponse downloadDocument(Long id, String email) {
     try {
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
         Document document = documentRepository
                 .findByIdAndUser(id, user)
-                .orElseThrow(() -> new RuntimeException("Document not found"));
+                .orElseThrow(() -> new DocumentNotFoundException("Document not found"));
 
         Path path = Paths.get(document.getFilePath());
 
@@ -137,11 +139,11 @@ public void deleteDocument(Long id, String email) {
     try {
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         Document document = documentRepository
                 .findByIdAndUser(id, user)
-                .orElseThrow(() -> new RuntimeException("Document not found"));
+                .orElseThrow(() -> new DocumentNotFoundException("Document not found"));
 
         Path path = Paths.get(document.getFilePath());
 
@@ -158,7 +160,7 @@ public void deleteDocument(Long id, String email) {
 public List<DocumentResponse> searchDocuments(String email, String keyword) {
 
     User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new UserNotFoundException("User not found"));
 
     return documentRepository
             .findByUserAndOriginalFileNameContainingIgnoreCase(user, keyword)
@@ -177,13 +179,13 @@ public List<DocumentResponse> searchDocuments(String email, String keyword) {
 public DocumentResponse renameDocument(Long id, String email, String newName) {
 
     User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new UserNotFoundException("User not found"));
 
     Document document = documentRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Document not found"));
+            .orElseThrow(() -> new DocumentNotFoundException("Document not found"));
 
     if (!document.getUser().getId().equals(user.getId())) {
-        throw new RuntimeException("Access denied");
+        throw new UnauthorizedException("Access denied");
     }
 
     document.setOriginalFileName(newName);
@@ -203,13 +205,13 @@ public DocumentResponse renameDocument(Long id, String email, String newName) {
 public DocumentResponse getDocument(Long id, String email) {
 
     User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new UserNotFoundException("User not found"));
 
     Document document = documentRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Document not found"));
+            .orElseThrow(() -> new DocumentNotFoundException("Document not found"));
 
     if (!document.getUser().getId().equals(user.getId())) {
-        throw new RuntimeException("Access denied");
+        throw new UnauthorizedException("Access denied");
     }
 
     return new DocumentResponse(
@@ -225,13 +227,13 @@ public DocumentResponse getDocument(Long id, String email) {
 public ShareResponse shareDocument(Long id, String email) {
 
     User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new UserNotFoundException("User not found"));
 
     Document document = documentRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Document not found"));
+            .orElseThrow(() -> new DocumentNotFoundException("Document not found"));
 
     if (!document.getUser().getId().equals(user.getId())) {
-        throw new RuntimeException("Access denied");
+        throw new UnauthorizedException("Access denied");
     }
 
     if (document.getShareToken() == null) {
@@ -246,7 +248,7 @@ public ShareResponse shareDocument(Long id, String email) {
 public DocumentDownloadResponse downloadSharedDocument(String shareToken) {
 
     Document document = documentRepository.findByShareToken(shareToken)
-            .orElseThrow(() -> new RuntimeException("Shared document not found"));
+            .orElseThrow(() -> new DocumentNotFoundException("Shared document not found"));
 
     Resource resource;
 

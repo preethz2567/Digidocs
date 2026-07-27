@@ -55,4 +55,43 @@ public ResponseEntity<Map<String, Object>> handleValidation(
             )
     );
 }
+
+@ExceptionHandler(UserNotFoundException.class)
+public ResponseEntity<Map<String, Object>> handleUserNotFound(
+        UserNotFoundException ex) {
+
+    return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(Map.of(
+                    "timestamp", LocalDateTime.now(),
+                    "status", 404,
+                    "error", ex.getMessage()
+            ));
+}
+
+@ExceptionHandler(DocumentNotFoundException.class)
+public ResponseEntity<Map<String, Object>> handleDocumentNotFound(
+        DocumentNotFoundException ex) {
+
+    return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(Map.of(
+                    "timestamp", LocalDateTime.now(),
+                    "status", 404,
+                    "error", ex.getMessage()
+            ));
+}
+
+@ExceptionHandler(UnauthorizedException.class)
+public ResponseEntity<Map<String, Object>> handleUnauthorized(
+        UnauthorizedException ex) {
+
+    return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body(Map.of(
+                    "timestamp", LocalDateTime.now(),
+                    "status", 401,
+                    "error", ex.getMessage()
+            ));
+}
 }

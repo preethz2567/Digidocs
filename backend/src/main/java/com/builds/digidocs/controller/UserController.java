@@ -38,8 +38,8 @@ public class UserController {
 
     @PutMapping("/change-password")
     public String changePassword(
-            @RequestBody ChangePasswordRequest request,
-            @RequestHeader("Authorization") String authHeader) {
+    @Valid @RequestBody ChangePasswordRequest request,
+    @RequestHeader("Authorization") String authHeader) {
 
         String token = authHeader.substring(7);
 

@@ -1,21 +1,23 @@
 package com.builds.digidocs.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class RenameDocumentRequest {
 
-    private String originalFileName;
+    @NotBlank(message = "New file name is required")
+    private String newName;
 
-    public RenameDocumentRequest() {
+    public RenameDocumentRequest() {}
+
+    public RenameDocumentRequest(String newName) {
+        this.newName = newName;
     }
 
-    public RenameDocumentRequest(String originalFileName) {
-        this.originalFileName = originalFileName;
+    public String getNewName() {
+        return newName;
     }
 
-    public String getOriginalFileName() {
-        return originalFileName;
-    }
-
-    public void setOriginalFileName(String originalFileName) {
-        this.originalFileName = originalFileName;
+    public void setNewName(String newName) {
+        this.newName = newName;
     }
 }
