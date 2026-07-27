@@ -34,6 +34,9 @@ public class Document {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column(unique = true)
+    private String shareToken;
+
     public Long getId() {
         return id;
     }
@@ -96,5 +99,13 @@ public class Document {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getShareToken() {
+        return shareToken;
+    }
+
+    public void setShareToken(String shareToken) {
+        this.shareToken = shareToken;
     }
 }

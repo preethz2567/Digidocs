@@ -1,6 +1,8 @@
 package com.builds.digidocs.service;
 
 import com.builds.digidocs.dto.DocumentResponse;
+import com.builds.digidocs.dto.ShareResponse;
+
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.core.io.Resource;
 import com.builds.digidocs.dto.DocumentDownloadResponse;
@@ -17,4 +19,6 @@ public interface DocumentService {
     List<DocumentResponse> searchDocuments(String email, String keyword);
     DocumentResponse renameDocument(Long id, String email, String newName);
     DocumentResponse getDocument(Long id, String email);
+    ShareResponse shareDocument(Long id, String email);
+    DocumentDownloadResponse downloadSharedDocument(String shareToken);
 }
