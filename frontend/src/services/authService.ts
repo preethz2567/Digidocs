@@ -1,17 +1,17 @@
 import api from "../api/axios";
 
-interface RegisterRequest {
+export interface RegisterRequest {
   name: string;
   email: string;
   password: string;
 }
 
-interface LoginRequest {
+export interface LoginRequest {
   email: string;
   password: string;
 }
 
-interface LoginResponse {
+export interface LoginResponse {
   token: string;
 }
 
@@ -37,10 +37,15 @@ const logout = () => {
   localStorage.removeItem("token");
 };
 
+const isLoggedIn = () => {
+  return !!localStorage.getItem("token");
+};
+
 const authService = {
   register,
   login,
   logout,
+  isLoggedIn,
 };
 
 export default authService;
