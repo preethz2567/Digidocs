@@ -16,8 +16,13 @@ const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: !!localStorage.getItem("token"),
 
   login: async (credentials) => {
-    await authService.login(credentials);
-    set({ isAuthenticated: true });
+    try {
+      await authService.login(credentials);
+      set({ isAuthenticated: true });
+    } catch (error) {
+      set({ isAuthenticated: false });
+      throw error;
+    }
   },
 
   logout: () => {
