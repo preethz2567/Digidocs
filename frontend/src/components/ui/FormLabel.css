@@ -1,0 +1,14 @@
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+  letter-spacing: 0.3px;
+}
+
+.form-label.required::after {
+  content: '*';
+  color: var(--error-color);
+  margin-left: var(--space-1);
+}

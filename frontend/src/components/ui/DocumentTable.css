@@ -1,0 +1,123 @@
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.doc-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.doc-table th {
+  padding: 10px 16px;
+  background-color: #fafafa;
+  color: #9ca3af;
+  font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+
+.doc-table td {
+  padding: 11px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: middle;
+  color: #6b7280;
+}
+
+.doc-table tr:last-child td {
+  border-bottom: none;
+}
+
+.doc-table tr {
+  transition: background-color 150ms ease;
+}
+
+.doc-table tr:hover {
+  background-color: #f3f4f6;
+}
+
+.doc-table tr:hover td {
+  color: #374151;
+}
+
+.doc-table tr.selected {
+  background-color: #f0f0f0;
+}
+
+.doc-table__col-checkbox {
+  width: 44px;
+  text-align: center;
+}
+
+.doc-table__col-checkbox input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: #111827;
+  cursor: pointer;
+}
+
+.doc-table__col-file {
+  width: 40%;
+}
+
+.doc-table__file-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.doc-table__file-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+.doc-table__file-icon svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.doc-table__filename {
+  font-weight: 500;
+  color: #111827;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.doc-table__filename:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.doc-table__badge {
+  display: inline-block;
+  padding: 2px 6px;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+  letter-spacing: 0.03em;
+}
+
+.doc-table__col-actions {
+  width: 52px;
+  text-align: right;
+}

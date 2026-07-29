@@ -1,0 +1,113 @@
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background-color: var(--bg-color, #ffffff);
+}
+
+.doc-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.doc-table th {
+  padding: 12px 16px;
+  background-color: var(--sidebar-bg, #FAFAFA);
+  color: var(--text-secondary);
+  font-weight: 500;
+  border-bottom: 1px solid var(--border-color);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+
+.doc-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+  color: var(--text-secondary);
+}
+
+.doc-table tr:last-child td {
+  border-bottom: none;
+}
+
+.doc-table tr {
+  transition: background-color 150ms ease;
+}
+
+.doc-table tr:hover {
+  background-color: var(--sidebar-bg, #FAFAFA);
+}
+
+.doc-table tr.selected {
+  background-color: #F3F4F6; /* Light gray active */
+}
+
+.doc-table__col-checkbox {
+  width: 48px;
+  text-align: center;
+}
+
+.doc-table__col-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--text-primary);
+  cursor: pointer;
+}
+
+.doc-table__col-file {
+  width: 40%;
+}
+
+.doc-table__file-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.doc-table__file-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background-color: var(--sidebar-bg, #FAFAFA);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+.doc-table__file-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.doc-table__filename {
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.doc-table__filename:hover {
+  text-decoration: underline;
+}
+
+.doc-table__badge {
+  display: inline-block;
+  padding: 2px 6px;
+  background-color: var(--sidebar-bg, #FAFAFA);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.doc-table__col-actions {
+  width: 60px;
+  text-align: right;
+}
