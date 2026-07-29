@@ -158,6 +158,7 @@ const Login: React.FC = () => {
             </div>
             <PasswordInput
               id="password"
+              label=""
               placeholder="••••••••"
               autoComplete="current-password"
               error={errors.password?.message}

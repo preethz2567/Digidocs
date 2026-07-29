@@ -1,4 +1,4 @@
-import React, { InputHTMLAttributes, forwardRef } from 'react';
+import React, { type InputHTMLAttributes, forwardRef } from 'react';
 import { FormLabel } from './FormLabel';
 import './Input.css';
 

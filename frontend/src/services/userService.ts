@@ -11,7 +11,7 @@ interface ChangePasswordRequest {
 }
 
 const getProfile = async () => {
-  const response = await api.get("/users/profile");
+  const response = await api.get("/users/me");
   return response.data;
 };
 

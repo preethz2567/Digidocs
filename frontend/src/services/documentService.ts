@@ -36,7 +36,7 @@ const renameDocument = async (
   originalFileName: string
 ) => {
   const response = await api.put(`/documents/${id}`, {
-    originalFileName,
+    newName: originalFileName,
   });
 
   return response.data;

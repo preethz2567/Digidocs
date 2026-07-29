@@ -9,6 +9,8 @@ import Profile from "./pages/Profile";
 import ChangePassword from "./pages/ChangePassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import VerifyEmail from "./pages/VerifyEmail";
+import Documents from "./pages/Documents";
+import { MainLayout } from "./layouts/MainLayout";
 
 function App() {
   return (
@@ -23,7 +25,20 @@ function App() {
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <MainLayout>
+                <Dashboard />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/documents"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <Documents />
+              </MainLayout>
             </ProtectedRoute>
           }
         />
@@ -32,7 +47,9 @@ function App() {
           path="/profile"
           element={
             <ProtectedRoute>
-              <Profile />
+              <MainLayout>
+                <Profile />
+              </MainLayout>
             </ProtectedRoute>
           }
         />
@@ -41,7 +58,9 @@ function App() {
           path="/change-password"
           element={
             <ProtectedRoute>
-              <ChangePassword />
+              <MainLayout>
+                <ChangePassword />
+              </MainLayout>
             </ProtectedRoute>
           }
         />

@@ -29,7 +29,7 @@ const ForgotPassword: React.FC = () => {
     mode: 'onTouched',
   });
 
-  const onSubmit = async (data: ForgotPasswordForm) => {
+  const onSubmit = async (_data: ForgotPasswordForm) => {
     try {
       // Mocking the backend call
       await new Promise((resolve) => setTimeout(resolve, 1000));
