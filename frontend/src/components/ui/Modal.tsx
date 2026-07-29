@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import { X } from 'lucide-react';
 import './Modal.css';
 
 interface ModalProps {
@@ -10,18 +11,44 @@ interface ModalProps {
 }
 
 export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, description, children }) => {
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      // Focus modal container for accessibility/trapping
+      modalRef.current?.focus();
+    }
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-container">
+    <div 
+      className="modal-overlay" 
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div 
+        className="modal-container animate-fade-in" 
+        ref={modalRef} 
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+      >
         <div className="modal-header">
           <div>
-            <h3 className="modal-title">{title}</h3>
+            <h3 id="modal-title" className="modal-title">{title}</h3>
             {description && <p className="modal-desc">{description}</p>}
           </div>
           <button className="modal-close" onClick={onClose} aria-label="Close modal">
-            <svg viewBox="0 0 24 24" width="16" height="16"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <X size={16} strokeWidth={2} />
           </button>
         </div>
         <div className="modal-content">

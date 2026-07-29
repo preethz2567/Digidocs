@@ -323,8 +323,7 @@ public DocumentDownloadResponse downloadSharedDocument(String shareToken) {
 
     if (document.getShareExpiry() == null ||
         document.getShareExpiry().isBefore(LocalDateTime.now())) {
-
-    throw new RuntimeException("Share link has expired");
+    throw new InvalidRequestException("Share link has expired");
 }
 
     Resource resource;
