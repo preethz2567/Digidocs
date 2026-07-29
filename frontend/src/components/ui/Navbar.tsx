@@ -2,27 +2,19 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Bell, ChevronDown, User as UserIcon, LogOut } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
-import userService from '../../services/userService';
 import './Navbar.css';
 
 export const Navbar: React.FC = () => {
   const navigate = useNavigate();
-  const logout = useAuthStore(state => state.logout);
-  const [userName, setUserName] = useState('');
-  const [userEmail, setUserEmail] = useState('');
+  const { user, logout, fetchUser } = useAuthStore();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const profile = await userService.getProfile();
-        if (profile?.name) setUserName(profile.name);
-        if (profile?.email) setUserEmail(profile.email);
-      } catch {}
-    };
-    fetchProfile();
-  }, []);
+    if (!user) {
+      fetchUser();
+    }
+  }, [user, fetchUser]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -34,6 +26,8 @@ export const Navbar: React.FC = () => {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  const userName = user?.name || '';
+  const userEmail = user?.email || '';
   const firstInitial = userName ? userName.charAt(0).toUpperCase() : 'U';
   const firstName = userName ? userName.split(' ')[0] : 'User';
 
@@ -65,7 +59,11 @@ export const Navbar: React.FC = () => {
             onClick={() => setDropdownOpen(o => !o)}
             aria-label="User menu"
           >
-            <div className="navbar__avatar">{firstInitial}</div>
+            {user?.avatarUrl ? (
+              <img src={user.avatarUrl} alt="Avatar" className="navbar__avatar-img" />
+            ) : (
+              <div className="navbar__avatar">{firstInitial}</div>
+            )}
             <span className="navbar__avatar-name">{firstName}</span>
             <span className="navbar__avatar-chevron">
               <ChevronDown size={14} strokeWidth={2.5} color="#9ca3af" />
