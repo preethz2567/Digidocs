@@ -49,7 +49,7 @@ const Dashboard: React.FC = () => {
     fetchData();
   }, []);
 
-  const totalStorage = documents.reduce((acc, doc) => acc + doc.fileSize, 0);
+  const totalStorage = documents.reduce((acc, doc) => acc + (doc.fileSize || 0), 0);
   const recentDocs = documents.slice(0, 5);
   // Approximation for shared links since we don't have a direct endpoint for counts
   const sharedCount = 0; // Keeping it static or calculated if backend returned it

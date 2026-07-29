@@ -10,6 +10,7 @@ import ChangePassword from "./pages/ChangePassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import Documents from "./pages/Documents";
+import { SharedDocument } from "./pages/SharedDocument";
 import { MainLayout } from "./layouts/MainLayout";
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/share/:token" element={<SharedDocument />} />
 
         <Route
           path="/dashboard"

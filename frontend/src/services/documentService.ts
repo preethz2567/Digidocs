@@ -1,4 +1,5 @@
 import api from "../api/axios";
+import publicApi from "../api/publicApi";
 
 const getDocuments = async (sort = "date") => {
   const response = await api.get(`/documents?sort=${sort}`);
@@ -11,7 +12,17 @@ const uploadDocument = async (file: File) => {
 
   const response = await api.post("/documents/upload", formData, {
     headers: {
-      "Content-Type": "multipart/form-data",
+      // Explicitly unset the global Content-Type so the browser can
+      // set multipart/form-data with the correct boundary automatically.
+      "Content-Type": null as any,
+    },
+    transformRequest: (data, headers) => {
+      // Remove the header so it is not sent at all.
+      if (headers) {
+        delete headers['Content-Type'];
+        delete headers.common?.['Content-Type'];
+      }
+      return data;
     },
   });
 
@@ -65,6 +76,23 @@ const revokeShare = async (id: number) => {
   return response.data;
 };
 
+const getSharedDocument = async (token: string) => {
+  const response = await publicApi.get(`/documents/share/${token}`, {
+    responseType: "blob",
+  });
+  
+  const contentDisposition = response.headers['content-disposition'];
+  let filename = 'Shared_Document';
+  if (contentDisposition && contentDisposition.includes('filename=')) {
+    const match = contentDisposition.match(/filename="?([^"]+)"?/);
+    if (match && match[1]) {
+      filename = match[1];
+    }
+  }
+  
+  return { blob: response.data as Blob, filename };
+};
+
 const documentService = {
   getDocuments,
   uploadDocument,
@@ -75,6 +103,7 @@ const documentService = {
   getMetadata,
   shareDocument,
   revokeShare,
+  getSharedDocument,
 };
 
 export default documentService;

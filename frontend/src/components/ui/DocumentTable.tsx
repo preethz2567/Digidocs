@@ -6,10 +6,9 @@ import './DocumentTable.css';
 export interface DocumentData {
   id: number;
   originalFileName: string;
-  storedFileName: string;
   fileSize: number;
   contentType: string;
-  createdAt: string;
+  uploadedAt: string; // matches backend DocumentResponse.uploadedAt
 }
 
 interface DocumentTableProps {
@@ -40,6 +39,14 @@ const formatSize = (bytes: number) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 };
 
+const getExtension = (filename: string) => {
+  const parts = filename.split('.');
+  if (parts.length > 1) {
+    return parts.pop()?.toUpperCase() || 'FILE';
+  }
+  return 'FILE';
+};
+
 export const DocumentTable: React.FC<DocumentTableProps> = ({
   documents,
   selectable,
@@ -67,7 +74,8 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({
                 />
               </th>
             )}
-            <th className="doc-table__col-file">Name</th>
+            <th className="doc-table__col-file">File</th>
+            <th>Type</th>
             <th>Size</th>
             <th>Uploaded</th>
             <th className="doc-table__col-actions"></th>
@@ -76,6 +84,7 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({
         <tbody>
           {documents.map((doc) => {
             const isSelected = selectedIds.includes(doc.id);
+            const ext = getExtension(doc.originalFileName);
             return (
               <tr key={doc.id} className={isSelected ? 'selected' : ''}>
                 {selectable && (
@@ -101,15 +110,20 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({
                     </span>
                   </div>
                 </td>
+                <td>
+                  <span className="doc-table__badge">{ext}</span>
+                </td>
                 <td>{formatSize(doc.fileSize)}</td>
-                <td>{formatDate(doc.createdAt)}</td>
+                <td>{formatDate(doc.uploadedAt)}</td>
                 <td className="doc-table__col-actions">
                   <ActionMenu
                     trigger={<MoreHorizontal size={16} strokeWidth={2} />}
                     items={[
                       { label: 'Download', onClick: () => onDownload?.(doc) },
-                      { label: 'Share', onClick: () => onShare?.(doc) },
+                      { label: 'Share / Copy Link', onClick: () => onShare?.(doc) },
+                      { label: 'Divider', onClick: () => {} },
                       { label: 'Rename', onClick: () => onRename?.(doc) },
+                      { label: 'Divider', onClick: () => {} },
                       { label: 'Delete', onClick: () => onDelete?.(doc), danger: true },
                     ]}
                   />

@@ -1,40 +1,49 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Plus, FileText } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { FileText } from 'lucide-react';
 import documentService from '../services/documentService';
 import { DocumentTable, type DocumentData } from '../components/ui/DocumentTable';
+import { DocumentToolbar, type FilterType, type SortType } from '../components/ui/DocumentToolbar';
 import { Pagination } from '../components/ui/Pagination';
 import { EmptyState } from '../components/ui/EmptyState';
 import { SkeletonTable } from '../components/ui/SkeletonCard';
-import { Modal } from '../components/ui/Modal';
-import { Input } from '../components/ui/Input';
-import { Button } from '../components/ui/Button';
 import { UploadModal } from '../components/ui/UploadModal';
+import { RenameModal } from '../components/ui/RenameModal';
+import { DeleteModal } from '../components/ui/DeleteModal';
+import { ShareModal } from '../components/ui/ShareModal';
 import { useToast } from '../components/ui/ToastContext';
 import './Documents.css';
 
 const ITEMS_PER_PAGE = 10;
 
+const getExtension = (filename: string) => {
+  const parts = filename.split('.');
+  if (parts.length > 1) {
+    return parts.pop()?.toUpperCase() || '';
+  }
+  return '';
+};
+
 const Documents: React.FC = () => {
   const [documents, setDocuments] = useState<DocumentData[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Toolbar State
   const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState<FilterType>('All');
+  const [sort, setSort] = useState<SortType>('Newest First');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  
+  // Modals State
   const [uploadOpen, setUploadOpen] = useState(false);
-
-  // Modal state
   const [renameOpen, setRenameOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [activeDoc, setActiveDoc] = useState<DocumentData | null>(null);
-  const [newName, setNewName] = useState('');
-  const [shareLink, setShareLink] = useState('');
-  const [shareLoading, setShareLoading] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { showToast } = useToast();
 
-  const fetchDocuments = async () => {
+  const fetchDocuments = useCallback(async () => {
     setLoading(true);
     try {
       const docs = await documentService.getDocuments('date');
@@ -44,26 +53,49 @@ const Documents: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     fetchDocuments();
-  }, []);
+  }, [fetchDocuments]);
 
-  const filteredDocs = useMemo(() => {
-    if (!search.trim()) return documents;
-    return documents.filter(d =>
-      d.originalFileName.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [documents, search]);
+  // Derived State (Client-side Search, Filter, Sort)
+  const processedDocs = useMemo(() => {
+    let result = [...documents];
 
-  const totalPages = Math.ceil(filteredDocs.length / ITEMS_PER_PAGE);
+    // Search
+    if (search.trim()) {
+      const query = search.toLowerCase();
+      result = result.filter(d => d.originalFileName.toLowerCase().includes(query));
+    }
+
+    // Filter by type
+    if (filter !== 'All') {
+      result = result.filter(d => getExtension(d.originalFileName) === filter);
+    }
+
+    // Sort
+    result.sort((a, b) => {
+      if (sort === 'Newest First') return new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime();
+      if (sort === 'Oldest First') return new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime();
+      if (sort === 'Largest First') return b.fileSize - a.fileSize;
+      if (sort === 'Smallest First') return a.fileSize - b.fileSize;
+      if (sort === 'Alphabetical') return a.originalFileName.localeCompare(b.originalFileName);
+      return 0;
+    });
+
+    return result;
+  }, [documents, search, filter, sort]);
+
+  const totalPages = Math.ceil(processedDocs.length / ITEMS_PER_PAGE);
   const paginatedDocs = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredDocs.slice(start, start + ITEMS_PER_PAGE);
-  }, [filteredDocs, currentPage]);
+    return processedDocs.slice(start, start + ITEMS_PER_PAGE);
+  }, [processedDocs, currentPage]);
 
-  useEffect(() => { setCurrentPage(1); }, [search]);
+  // Reset pagination on search/filter changes
+  useEffect(() => { setCurrentPage(1); }, [search, filter, sort]);
 
   const handleSelect = (id: number) =>
     setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
@@ -86,49 +118,13 @@ const Documents: React.FC = () => {
     }
   };
 
-  const confirmDelete = async () => {
-    if (!activeDoc) return;
-    setIsSubmitting(true);
-    try {
-      await documentService.deleteDocument(activeDoc.id);
-      setDocuments(d => d.filter(doc => doc.id !== activeDoc.id));
-      showToast('Document deleted.', 'success');
-      setDeleteOpen(false);
-    } catch {
-      showToast('Failed to delete document.', 'error');
-    } finally {
-      setIsSubmitting(false);
-    }
+  // Optimistic Handlers for Modals
+  const onRenameSuccess = (updatedDoc: DocumentData) => {
+    setDocuments(prev => prev.map(d => d.id === updatedDoc.id ? { ...d, originalFileName: updatedDoc.originalFileName } : d));
   };
 
-  const confirmRename = async () => {
-    if (!activeDoc || !newName.trim()) return;
-    setIsSubmitting(true);
-    try {
-      const updated = await documentService.renameDocument(activeDoc.id, newName.trim());
-      setDocuments(d => d.map(doc => doc.id === activeDoc.id ? { ...doc, originalFileName: updated.originalFileName } : doc));
-      showToast('Document renamed.', 'success');
-      setRenameOpen(false);
-    } catch {
-      showToast('Failed to rename document.', 'error');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleShare = async (doc: DocumentData) => {
-    setActiveDoc(doc);
-    setShareLink('');
-    setShareOpen(true);
-    setShareLoading(true);
-    try {
-      const res = await documentService.shareDocument(doc.id);
-      setShareLink(`${window.location.origin}/share/${res.shareToken}`);
-    } catch {
-      showToast('Failed to generate share link.', 'error');
-    } finally {
-      setShareLoading(false);
-    }
+  const onDeleteSuccess = (id: number) => {
+    setDocuments(prev => prev.filter(d => d.id !== id));
   };
 
   return (
@@ -136,51 +132,29 @@ const Documents: React.FC = () => {
       <div className="documents-page__header">
         <div>
           <h1 className="documents-page__title">Documents</h1>
-          <p className="documents-page__subtitle">
-            {loading ? 'Loading...' : `${documents.length} file${documents.length !== 1 ? 's' : ''}`}
-          </p>
+          <p className="documents-page__subtitle">Manage all uploaded files securely.</p>
         </div>
       </div>
 
-      <div className="documents-page__toolbar">
-        <div className="toolbar__search">
-          <Search size={14} strokeWidth={2} className="toolbar__search-icon" color="#9ca3af" />
-          <input
-            type="text"
-            placeholder="Search documents..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-        </div>
-        <div className="toolbar__filters">
-          <select className="toolbar__select">
-            <option>All Types</option>
-            <option>PDF</option>
-            <option>Images</option>
-            <option>Documents</option>
-          </select>
-          <select className="toolbar__select">
-            <option>Newest First</option>
-            <option>Oldest First</option>
-            <option>Largest First</option>
-          </select>
-        </div>
-        <button className="btn-upload-sm" onClick={() => setUploadOpen(true)}>
-          <Plus size={14} strokeWidth={2.5} />
-          Upload
-        </button>
-      </div>
+      <DocumentToolbar
+        search={search}
+        onSearchChange={setSearch}
+        filter={filter}
+        onFilterChange={setFilter}
+        sort={sort}
+        onSortChange={setSort}
+        onUploadClick={() => setUploadOpen(true)}
+      />
 
       {loading ? (
         <SkeletonTable />
-      ) : filteredDocs.length === 0 ? (
+      ) : processedDocs.length === 0 ? (
         <EmptyState
-          title={search ? 'No results found' : 'No documents yet'}
-          description={search ? 'Try adjusting your search.' : 'Upload your first document to get started.'}
+          title={search || filter !== 'All' ? 'No results found' : 'No documents uploaded'}
+          description={search || filter !== 'All' ? 'Try adjusting your search or filters.' : ''}
           icon={<FileText size={24} strokeWidth={1.5} />}
-          action={!search && (
-            <button className="btn-upload-sm" onClick={() => setUploadOpen(true)}>
-              <Plus size={14} strokeWidth={2.5} />
+          action={(!search && filter === 'All') && (
+            <button className="btn-upload-sm" onClick={() => setUploadOpen(true)} style={{ marginTop: 12 }}>
               Upload Document
             </button>
           )}
@@ -194,49 +168,19 @@ const Documents: React.FC = () => {
             onSelect={handleSelect}
             onSelectAll={handleSelectAll}
             onDownload={handleDownload}
-            onRename={doc => { setActiveDoc(doc); setNewName(doc.originalFileName); setRenameOpen(true); }}
+            onRename={doc => { setActiveDoc(doc); setRenameOpen(true); }}
             onDelete={doc => { setActiveDoc(doc); setDeleteOpen(true); }}
-            onShare={handleShare}
+            onShare={doc => { setActiveDoc(doc); setShareOpen(true); }}
           />
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </div>
       )}
 
+      {/* Modals composed of BaseModal */}
       <UploadModal isOpen={uploadOpen} onClose={() => setUploadOpen(false)} onSuccess={() => { setUploadOpen(false); fetchDocuments(); }} />
-
-      <Modal isOpen={renameOpen} onClose={() => setRenameOpen(false)} title="Rename Document">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <Input id="rename-input" label="New name" value={newName} onChange={e => setNewName(e.target.value)} />
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-            <button className="btn-secondary-sm" onClick={() => setRenameOpen(false)}>Cancel</button>
-            <Button onClick={confirmRename} isLoading={isSubmitting}>Rename</Button>
-          </div>
-        </div>
-      </Modal>
-
-      <Modal isOpen={deleteOpen} onClose={() => setDeleteOpen(false)} title="Delete document" description={`Delete "${activeDoc?.originalFileName}"? This cannot be undone.`}>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 16 }}>
-          <button className="btn-secondary-sm" onClick={() => setDeleteOpen(false)}>Cancel</button>
-          <button className="btn-danger-sm" onClick={confirmDelete} disabled={isSubmitting}>
-            {isSubmitting ? 'Deleting…' : 'Delete'}
-          </button>
-        </div>
-      </Modal>
-
-      <Modal isOpen={shareOpen} onClose={() => setShareOpen(false)} title="Share Document" description="Anyone with this link can view the document.">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 8 }}>
-          {shareLoading ? (
-            <p style={{ fontSize: 13, color: '#6b7280' }}>Generating secure link…</p>
-          ) : (
-            <div style={{ display: 'flex', gap: 8 }}>
-              <Input id="share-link" value={shareLink} readOnly style={{ flex: 1 }} />
-              <Button onClick={() => { navigator.clipboard.writeText(shareLink); showToast('Copied!', 'success'); }}>
-                Copy
-              </Button>
-            </div>
-          )}
-        </div>
-      </Modal>
+      <RenameModal isOpen={renameOpen} onClose={() => setRenameOpen(false)} document={activeDoc} onSuccess={onRenameSuccess} />
+      <DeleteModal isOpen={deleteOpen} onClose={() => setDeleteOpen(false)} document={activeDoc} onSuccess={onDeleteSuccess} />
+      <ShareModal isOpen={shareOpen} onClose={() => setShareOpen(false)} document={activeDoc} />
     </div>
   );
 };
