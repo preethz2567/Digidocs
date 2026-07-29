@@ -12,6 +12,10 @@ public interface UserService {
     RegisterResponse register(RegisterRequest request);
     LoginResponse login(LoginRequest request);
     ProfileResponse getProfile(String email);
+    ProfileResponse updateProfile(String email, com.builds.digidocs.dto.UpdateProfileRequest request);
+    void uploadAvatar(String email, org.springframework.web.multipart.MultipartFile file);
+    void deleteAvatar(String email);
+    org.springframework.core.io.Resource getAvatar(String email);
     void changePassword(String email, ChangePasswordRequest request);
 
 }

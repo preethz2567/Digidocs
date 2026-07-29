@@ -9,7 +9,7 @@ export interface DocumentData {
   storedFileName: string;
   fileSize: number;
   contentType: string;
-  createdAt: string;
+  uploadedAt: string;
 }
 
 interface DocumentTableProps {
@@ -24,12 +24,17 @@ interface DocumentTableProps {
   onDownload?: (doc: DocumentData) => void;
 }
 
-const formatDate = (dateStr: string) => {
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  }).format(new Date(dateStr));
+const formatDate = (dateStr: string | undefined) => {
+  if (!dateStr) return 'Unknown';
+  try {
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    }).format(new Date(dateStr));
+  } catch {
+    return 'Unknown';
+  }
 };
 
 const formatSize = (bytes: number) => {
@@ -102,7 +107,7 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({
                   </div>
                 </td>
                 <td>{formatSize(doc.fileSize)}</td>
-                <td>{formatDate(doc.createdAt)}</td>
+                <td>{formatDate(doc.uploadedAt)}</td>
                 <td className="doc-table__col-actions">
                   <ActionMenu
                     trigger={<MoreHorizontal size={16} strokeWidth={2} />}

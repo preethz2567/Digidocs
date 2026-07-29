@@ -26,6 +26,9 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column
+    private String profileImage;
+
     @OneToMany(mappedBy = "user",orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Document> documents = new ArrayList<>();
 
@@ -75,5 +78,13 @@ public class User {
 
     public void setDocuments(List<Document> documents) {
         this.documents = documents;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 }
