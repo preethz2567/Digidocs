@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Upload, Share2, Pencil, Trash2, FileText, HardDrive, Link as LinkIcon, Plus } from 'lucide-react';
 import documentService from '../services/documentService';
 import userService from '../services/userService';
+import { getRecentlyViewed, addRecentlyViewed } from '../services/recentlyViewedService';
 import { StatsCard } from '../components/ui/StatsCard';
 import { QuickActionCard } from '../components/ui/QuickActionCard';
 import { DocumentTable, type DocumentData } from '../components/ui/DocumentTable';
@@ -50,7 +51,11 @@ const Dashboard: React.FC = () => {
   }, []);
 
   const totalStorage = documents.reduce((acc, doc) => acc + (doc?.fileSize || 0), 0);
-  const recentDocs = documents.slice(0, 5);
+  const viewedIds = getRecentlyViewed();
+  const recentDocs = viewedIds
+    .map(id => documents.find(doc => doc.id === id))
+    .filter((doc): doc is DocumentData => doc !== undefined)
+    .slice(0, 5);
   // Approximation for shared links since we don't have a direct endpoint for counts
   const sharedCount = 0; // Keeping it static or calculated if backend returned it
 
@@ -107,7 +112,7 @@ const Dashboard: React.FC = () => {
         {/* Left Column */}
         <div className="dashboard__col-left">
           <div className="dashboard__section-header">
-            <h2 className="dashboard__section-title">Recent Documents</h2>
+            <h2 className="dashboard__section-title">Recently Viewed</h2>
             <button className="dashboard__btn-link" onClick={() => navigate('/documents')}>
               View all
             </button>
@@ -122,6 +127,7 @@ const Dashboard: React.FC = () => {
                 onDelete={() => navigate('/documents')}
                 onShare={() => navigate('/documents')}
                 onDownload={async (doc) => {
+                  addRecentlyViewed(doc.id);
                   const blob = await documentService.downloadDocument(doc.id);
                   const url = window.URL.createObjectURL(blob);
                   const a = document.createElement('a');
@@ -134,8 +140,8 @@ const Dashboard: React.FC = () => {
               />
             ) : (
               <EmptyState
-                title="No documents yet"
-                description="Upload your first document to get started."
+                title="No recently viewed documents"
+                description="Documents you view or download will appear here."
                 icon={<FileText size={24} strokeWidth={1.5} />}
                 action={
                   <button className="btn-upload" onClick={() => setUploadOpen(true)}>

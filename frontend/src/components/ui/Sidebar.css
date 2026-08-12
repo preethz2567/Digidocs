@@ -2,8 +2,8 @@
    Sidebar — GitHub-style
    =========================== */
 .sidebar {
-  width: 250px;
-  min-width: 250px;
+  width: 220px;
+  min-width: 220px;
   background-color: #fafafa;
   border-right: 1px solid #e5e7eb;
   display: flex;
@@ -16,7 +16,7 @@
 }
 
 .sidebar__header {
-  height: 60px;
+  height: 56px;
   display: flex;
   align-items: center;
   padding: 0 16px;
@@ -41,16 +41,6 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-}
-
-.sidebar__brand-logo svg {
-  width: 12px;
-  height: 12px;
-  stroke: #fff;
-  fill: none;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
 }
 
 .sidebar__brand-name {
@@ -81,20 +71,21 @@
 .sidebar__link {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   padding: 7px 10px;
   color: #6b7280;
   text-decoration: none;
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 500;
   border-radius: 6px;
-  transition: all 150ms ease;
+  transition: background-color 120ms ease, color 120ms ease;
   position: relative;
   border: none;
   background: transparent;
   cursor: pointer;
   width: 100%;
   text-align: left;
+  font-family: inherit;
 }
 
 .sidebar__link:hover {
@@ -102,7 +93,12 @@
   color: #111827;
 }
 
-/* GitHub-style active: left border + very subtle grey */
+.sidebar__link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #111827;
+}
+
+/* Active: left border accent */
 .sidebar__link.active {
   background-color: #f0f0f0;
   color: #111827;
@@ -129,16 +125,6 @@
   justify-content: center;
 }
 
-.sidebar__icon svg {
-  width: 16px;
-  height: 16px;
-  stroke: currentColor;
-  fill: none;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
 .sidebar__footer {
   padding: 8px;
   border-top: 1px solid #e5e7eb;
@@ -151,4 +137,11 @@
 .sidebar__footer .sidebar__link:hover {
   background-color: #fef2f2;
   color: #dc2626;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
 }

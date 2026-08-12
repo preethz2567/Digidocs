@@ -89,7 +89,7 @@
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 6px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* Upload button */
@@ -130,5 +130,26 @@
 @media (max-width: 900px) {
   .dashboard__main-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard {
+    padding: 8px 0 32px;
+    gap: 24px;
+  }
+
+  .dashboard__header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .dashboard__stats-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .quick-actions-grid-2x2 {
+    grid-template-columns: 1fr 1fr;
   }
 }

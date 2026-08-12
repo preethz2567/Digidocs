@@ -22,6 +22,7 @@ interface DocumentTableProps {
   onDelete?: (doc: DocumentData) => void;
   onShare?: (doc: DocumentData) => void;
   onDownload?: (doc: DocumentData) => void;
+  onPreview?: (doc: DocumentData) => void;
 }
 
 const formatDate = (dateStr: string | undefined) => {
@@ -54,7 +55,8 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({
   onRename,
   onDelete,
   onShare,
-  onDownload
+  onDownload,
+  onPreview
 }) => {
   const allSelected = documents.length > 0 && selectedIds.length === documents.length;
 
@@ -99,8 +101,8 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({
                     </div>
                     <span 
                       className="doc-table__filename" 
-                      onClick={() => onDownload?.(doc)}
-                      title="Click to download"
+                      onClick={() => (onPreview ? onPreview(doc) : onDownload?.(doc))}
+                      title="Click to preview"
                     >
                       {doc.originalFileName}
                     </span>
@@ -109,15 +111,16 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({
                 <td>{formatSize(doc.fileSize)}</td>
                 <td>{formatDate(doc.uploadedAt)}</td>
                 <td className="doc-table__col-actions">
-                  <ActionMenu
-                    trigger={<MoreHorizontal size={16} strokeWidth={2} />}
-                    items={[
-                      { label: 'Download', onClick: () => onDownload?.(doc) },
-                      { label: 'Share', onClick: () => onShare?.(doc) },
-                      { label: 'Rename', onClick: () => onRename?.(doc) },
-                      { label: 'Delete', onClick: () => onDelete?.(doc), danger: true },
-                    ]}
-                  />
+                    <ActionMenu
+                      trigger={<MoreHorizontal size={16} strokeWidth={2} />}
+                      items={[
+                        { label: 'Preview', onClick: () => onPreview?.(doc) },
+                        { label: 'Download', onClick: () => onDownload?.(doc) },
+                        { label: 'Share', onClick: () => onShare?.(doc) },
+                        { label: 'Rename', onClick: () => onRename?.(doc) },
+                        { label: 'Delete', onClick: () => onDelete?.(doc), danger: true },
+                      ]}
+                    />
                 </td>
               </tr>
             );
