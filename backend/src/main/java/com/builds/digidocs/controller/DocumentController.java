@@ -152,4 +152,20 @@ public ResponseEntity<String> revokeShare(
     return ResponseEntity.ok("Share link revoked successfully");
 }
 
+@GetMapping("/share/{shareToken}")
+public ResponseEntity<?> downloadSharedDocumentPublic(@PathVariable String shareToken) {
+    try {
+        DocumentDownloadResponse response = documentService.downloadSharedDocument(shareToken);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + response.getOriginalFileName() + "\"")
+                .header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION)
+                .body(response.getResource());
+    } catch (com.builds.digidocs.exception.DocumentNotFoundException e) {
+        return ResponseEntity.status(404).body("Invalid or expired share token");
+    } catch (Exception e) {
+        return ResponseEntity.status(500).body("Failed to retrieve shared document");
+    }
+}
+
 }
