@@ -40,6 +40,11 @@ const Documents: React.FC = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewOwner, setPreviewOwner] = useState('');
 
+  // Bulk action state
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [bulkShareOpen, setBulkShareOpen] = useState(false);
+  const [bulkShareLinks, setBulkShareLinks] = useState<string[]>([]);
+
   const { showToast } = useToast();
 
   const fetchDocuments = async () => {
@@ -140,6 +145,57 @@ const Documents: React.FC = () => {
     }
   };
 
+  const handleBulkDownload = async () => {
+    try {
+      await Promise.all(selectedIds.map(async (id) => {
+        const doc = documents.find(d => d.id === id);
+        if (!doc) return;
+        addRecentlyViewed(id);
+        const blob = await documentService.downloadDocument(id);
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = doc.originalFileName;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+      }));
+    } catch {
+      showToast('Some downloads failed.', 'error');
+    }
+  };
+
+  const confirmBulkDelete = async () => {
+    setIsSubmitting(true);
+    try {
+      await Promise.all(selectedIds.map(id => documentService.deleteDocument(id)));
+      setDocuments(d => d.filter(doc => !selectedIds.includes(doc.id)));
+      setSelectedIds([]);
+      showToast('Selected documents deleted.', 'success');
+      setBulkDeleteOpen(false);
+    } catch {
+      showToast('Failed to delete some documents.', 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleBulkShare = async () => {
+    setBulkShareOpen(true);
+    setShareLoading(true);
+    try {
+      const links = await Promise.all(selectedIds.map(async id => {
+        const res = await documentService.shareDocument(id);
+        return `${window.location.origin}/share/${res.shareToken}`;
+      }));
+      setBulkShareLinks(links);
+    } catch {
+      showToast('Failed to generate some share links.', 'error');
+    } finally {
+      setShareLoading(false);
+    }
+  };
+
   const handlePreview = async (doc: DocumentData) => {
     addRecentlyViewed(doc.id);
     setPreviewDoc(doc);
@@ -213,6 +269,17 @@ const Documents: React.FC = () => {
         </button>
       </div>
 
+      {selectedIds.length > 0 && (
+        <div className="documents-page__bulk-actions">
+          <span className="bulk-actions-info">{selectedIds.length} item(s) selected</span>
+          <div className="bulk-actions-group">
+            <button className="btn-secondary-sm" onClick={handleBulkDownload}>Download Selected</button>
+            <button className="btn-secondary-sm" onClick={handleBulkShare}>Share Selected</button>
+            <button className="btn-danger-sm" onClick={() => setBulkDeleteOpen(true)}>Delete Selected</button>
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <SkeletonTable />
       ) : filteredDocs.length === 0 ? (
@@ -284,6 +351,39 @@ const Documents: React.FC = () => {
               </Button>
             </div>
           )}
+        </div>
+      </Modal>
+
+      <Modal isOpen={bulkDeleteOpen} onClose={() => setBulkDeleteOpen(false)} title="Delete Documents" description={`Are you sure you want to delete ${selectedIds.length} document(s)? This cannot be undone.`}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 16 }}>
+          <button className="btn-secondary-sm" onClick={() => setBulkDeleteOpen(false)} disabled={isSubmitting}>Cancel</button>
+          <Button variant="danger" onClick={confirmBulkDelete} isLoading={isSubmitting} loadingText="Deleting...">
+            Delete All
+          </Button>
+        </div>
+      </Modal>
+
+      <Modal isOpen={bulkShareOpen} onClose={() => setBulkShareOpen(false)} title="Share Selected Documents" description="Anyone with these links can view the documents.">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 8 }}>
+          {shareLoading ? (
+            <p style={{ fontSize: 13, color: '#6b7280' }}>Generating secure links…</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: '200px', overflowY: 'auto' }}>
+              {bulkShareLinks.map((link, idx) => (
+                <div key={idx} style={{ display: 'flex', gap: 8 }}>
+                  <Input id={`share-link-${idx}`} value={link} readOnly style={{ flex: 1 }} />
+                  <Button onClick={() => { navigator.clipboard.writeText(link); showToast('Copied!', 'success'); }}>
+                    Copy
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12 }}>
+            <Button onClick={() => { navigator.clipboard.writeText(bulkShareLinks.join('\n')); showToast('All links copied!', 'success'); }}>
+              Copy All Links
+            </Button>
+          </div>
         </div>
       </Modal>
 
