@@ -9,8 +9,8 @@ import { QuickActionCard } from '../components/ui/QuickActionCard';
 import { DocumentTable, type DocumentData } from '../components/ui/DocumentTable';
 import { SkeletonCard, SkeletonTable } from '../components/ui/SkeletonCard';
 import { EmptyState } from '../components/ui/EmptyState';
-import { UploadModal } from '../components/ui/UploadModal';
 import { StorageAnalytics } from '../components/ui/StorageAnalytics';
+import { useUiStore } from '../store/uiStore';
 import './Dashboard.css';
 
 const formatBytes = (bytes: number) => {
@@ -26,7 +26,7 @@ const Dashboard: React.FC = () => {
   const [userName, setUserName] = useState('');
   const [documents, setDocuments] = useState<DocumentData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [uploadOpen, setUploadOpen] = useState(false);
+  const { setUploadModalOpen } = useUiStore();
 
   const fetchDocs = useCallback(async () => {
     const docs = await documentService.getDocuments('date');
@@ -76,7 +76,7 @@ const Dashboard: React.FC = () => {
           </h1>
           <p className="dashboard__subtitle">{currentDate}</p>
         </div>
-        <button className="btn-upload" onClick={() => setUploadOpen(true)}>
+        <button className="btn-upload" onClick={() => setUploadModalOpen(true)}>
           <Plus size={16} strokeWidth={2.5} />
           Upload
         </button>
@@ -145,7 +145,7 @@ const Dashboard: React.FC = () => {
                 description="Documents you view or download will appear here."
                 icon={<FileText size={24} strokeWidth={1.5} />}
                 action={
-                  <button className="btn-upload" onClick={() => setUploadOpen(true)}>
+                  <button className="btn-upload" onClick={() => setUploadModalOpen(true)}>
                     <Plus size={16} strokeWidth={2.5} />
                     Upload Document
                   </button>
@@ -163,7 +163,7 @@ const Dashboard: React.FC = () => {
           <div className="quick-actions-grid-2x2">
             <QuickActionCard
               label="Upload"
-              onClick={() => setUploadOpen(true)}
+              onClick={() => setUploadModalOpen(true)}
               icon={<Upload size={20} strokeWidth={1.5} />}
             />
             <QuickActionCard
@@ -187,12 +187,6 @@ const Dashboard: React.FC = () => {
       </div>
 
       <StorageAnalytics documents={documents} />
-
-      <UploadModal
-        isOpen={uploadOpen}
-        onClose={() => setUploadOpen(false)}
-        onSuccess={() => { setUploadOpen(false); fetchDocs(); }}
-      />
     </div>
   );
 };
