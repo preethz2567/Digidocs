@@ -137,7 +137,7 @@
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 6px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* Shared modal button styles */
@@ -180,4 +180,19 @@
 .btn-danger-sm:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .documents-page__toolbar {
+    flex-wrap: wrap;
+  }
+
+  .toolbar__filters {
+    display: none;
+  }
+
+  .toolbar__search {
+    flex: 1 1 100%;
+  }
 }

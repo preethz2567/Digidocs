@@ -1,4 +1,11 @@
 import api from "../api/axios";
+import axios from "axios";
+
+// Axios instance without auth interceptor for public endpoints
+const publicApi = axios.create({
+  baseURL: "http://localhost:8081/api",
+});
+
 
 const getDocuments = async (sort = "date") => {
   const response = await api.get(`/documents?sort=${sort}`);
@@ -75,6 +82,25 @@ const documentService = {
   getMetadata,
   shareDocument,
   revokeShare,
+};
+
+/**
+ * Fetch a publicly shared document using its token.
+ * Returns the file Blob and the filename parsed from Content-Disposition.
+ */
+export const getSharedDocument = async (token: string): Promise<{ blob: Blob; filename: string }> => {
+  const response = await publicApi.get(`/documents/share/${token}`, {
+    responseType: "blob",
+  });
+
+  const disposition: string = response.headers["content-disposition"] || "";
+  let filename = "document";
+  const match = disposition.match(/filename\*?=['"]?(?:UTF-8'')?([^;"'\n]+)/i);
+  if (match && match[1]) {
+    filename = decodeURIComponent(match[1].trim());
+  }
+
+  return { blob: response.data, filename };
 };
 
 export default documentService;

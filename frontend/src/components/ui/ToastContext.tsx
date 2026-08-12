@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, type ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { CheckCircle, AlertCircle, Info, X } from 'lucide-react';
 
 type ToastType = 'success' | 'error' | 'info';
 
@@ -16,28 +17,42 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export const useToast = () => {
   const context = useContext(ToastContext);
-  if (!context) {
-    throw new Error('useToast must be used within a ToastProvider');
-  }
+  if (!context) throw new Error('useToast must be used within a ToastProvider');
   return context;
+};
+
+const iconMap = {
+  success: <CheckCircle size={15} strokeWidth={2} />,
+  error: <AlertCircle size={15} strokeWidth={2} />,
+  info: <Info size={15} strokeWidth={2} />,
+};
+
+const bgMap: Record<ToastType, string> = {
+  success: '#111827',
+  error: '#dc2626',
+  info: '#374151',
 };
 
 export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
-  const showToast = (message: string, type: ToastType) => {
+  const showToast = useCallback((message: string, type: ToastType) => {
     const id = Date.now();
-    setToasts((prev) => [...prev, { id, message, type }]);
-    
+    setToasts(prev => [...prev, { id, message, type }]);
     setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 3000);
-  };
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 4000);
+  }, []);
+
+  const dismiss = (id: number) => setToasts(prev => prev.filter(t => t.id !== id));
 
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
       <div
+        role="region"
+        aria-live="polite"
+        aria-label="Notifications"
         style={{
           position: 'fixed',
           bottom: '24px',
@@ -46,49 +61,61 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           flexDirection: 'column',
           gap: '8px',
           zIndex: 9999,
+          pointerEvents: 'none',
         }}
       >
-        {toasts.map((toast) => (
+        {toasts.map(toast => (
           <div
             key={toast.id}
+            role="alert"
             style={{
-              padding: '12px 16px',
-              backgroundColor: toast.type === 'success' ? 'var(--success-color)' : toast.type === 'error' ? 'var(--error-color)' : '#111',
-              color: '#fff',
-              fontSize: '14px',
-              fontWeight: 500,
-              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
-              minWidth: '280px',
-              animation: 'fade-in 0.2s ease',
+              justifyContent: 'space-between',
+              gap: '10px',
+              padding: '11px 14px',
+              backgroundColor: bgMap[toast.type],
+              color: '#fff',
+              fontSize: '13px',
+              fontWeight: 500,
+              fontFamily: 'inherit',
+              borderRadius: '6px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              minWidth: '260px',
+              maxWidth: '360px',
+              pointerEvents: 'all',
+              animation: 'toast-in 200ms ease forwards',
             }}
           >
-            {toast.type === 'success' && (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M20 6L9 17l-5-5"></path>
-              </svg>
-            )}
-            {toast.type === 'error' && (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-              </svg>
-            )}
-            {toast.message}
+            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {iconMap[toast.type]}
+              {toast.message}
+            </span>
+            <button
+              onClick={() => dismiss(toast.id)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'rgba(255,255,255,0.7)',
+                cursor: 'pointer',
+                padding: '2px',
+                display: 'flex',
+                alignItems: 'center',
+                flexShrink: 0,
+              }}
+              aria-label="Dismiss notification"
+            >
+              <X size={13} strokeWidth={2} />
+            </button>
           </div>
         ))}
       </div>
-      <style>
-        {`
-          @keyframes fade-in {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-        `}
-      </style>
+      <style>{`
+        @keyframes toast-in {
+          from { opacity: 0; transform: translateY(8px) scale(0.98); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+      `}</style>
     </ToastContext.Provider>
   );
 };

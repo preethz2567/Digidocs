@@ -17,3 +17,10 @@
   padding: 32px 36px;
   overflow-y: auto;
 }
+
+/* Mobile: no sidebar, full-width content */
+@media (max-width: 768px) {
+  .layout__content {
+    padding: 20px 16px;
+  }
+}

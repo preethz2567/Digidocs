@@ -134,7 +134,7 @@ const Dashboard: React.FC = () => {
               />
             ) : (
               <EmptyState
-                title="No documents yet"
+                title="No documents uploaded yet"
                 description="Upload your first document to get started."
                 icon={<FileText size={24} strokeWidth={1.5} />}
                 action={

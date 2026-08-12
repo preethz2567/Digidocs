@@ -10,6 +10,7 @@ import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { UploadModal } from '../components/ui/UploadModal';
 import { useToast } from '../components/ui/ToastContext';
+import { FilePreviewModal } from '../components/ui/FilePreviewModal';
 import './Documents.css';
 
 const ITEMS_PER_PAGE = 10;
@@ -31,6 +32,12 @@ const Documents: React.FC = () => {
   const [shareLink, setShareLink] = useState('');
   const [shareLoading, setShareLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Preview state
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewDoc, setPreviewDoc] = useState<DocumentData | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewOwner, setPreviewOwner] = useState('');
 
   const { showToast } = useToast();
 
@@ -131,6 +138,38 @@ const Documents: React.FC = () => {
     }
   };
 
+  const handlePreview = async (doc: DocumentData) => {
+    setPreviewDoc(doc);
+    setPreviewOpen(true);
+    setPreviewUrl(null);
+    setPreviewOwner('');
+
+    try {
+      const [blob, metadata] = await Promise.all([
+        documentService.downloadDocument(doc.id),
+        documentService.getMetadata(doc.id).catch(() => ({ ownerName: 'Unknown' }))
+      ]);
+      const url = window.URL.createObjectURL(blob);
+      setPreviewUrl(url);
+      
+      const ownerName = metadata.ownerName || (metadata.user && (metadata.user.name || metadata.user.email)) || 'Unknown';
+      setPreviewOwner(ownerName);
+    } catch {
+      showToast('Failed to load preview.', 'error');
+      setPreviewOpen(false);
+    }
+  };
+
+  const closePreview = () => {
+    setPreviewOpen(false);
+    if (previewUrl) {
+      window.URL.revokeObjectURL(previewUrl);
+    }
+    setPreviewDoc(null);
+    setPreviewUrl(null);
+    setPreviewOwner('');
+  };
+
   return (
     <div className="documents-page">
       <div className="documents-page__header">
@@ -194,6 +233,7 @@ const Documents: React.FC = () => {
             onSelect={handleSelect}
             onSelectAll={handleSelectAll}
             onDownload={handleDownload}
+            onPreview={handlePreview}
             onRename={doc => { setActiveDoc(doc); setNewName(doc.originalFileName); setRenameOpen(true); }}
             onDelete={doc => { setActiveDoc(doc); setDeleteOpen(true); }}
             onShare={handleShare}
@@ -206,20 +246,26 @@ const Documents: React.FC = () => {
 
       <Modal isOpen={renameOpen} onClose={() => setRenameOpen(false)} title="Rename Document">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <Input id="rename-input" label="New name" value={newName} onChange={e => setNewName(e.target.value)} />
+          <Input
+            id="rename-input"
+            label="New name"
+            value={newName}
+            onChange={e => setNewName(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter' && !isSubmitting && newName.trim()) confirmRename(); }}
+          />
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-            <button className="btn-secondary-sm" onClick={() => setRenameOpen(false)}>Cancel</button>
-            <Button onClick={confirmRename} isLoading={isSubmitting}>Rename</Button>
+            <button className="btn-secondary-sm" onClick={() => setRenameOpen(false)} disabled={isSubmitting}>Cancel</button>
+            <Button onClick={confirmRename} isLoading={isSubmitting} loadingText="Renaming..." disabled={!newName.trim()}>Rename</Button>
           </div>
         </div>
       </Modal>
 
       <Modal isOpen={deleteOpen} onClose={() => setDeleteOpen(false)} title="Delete document" description={`Delete "${activeDoc?.originalFileName}"? This cannot be undone.`}>
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 16 }}>
-          <button className="btn-secondary-sm" onClick={() => setDeleteOpen(false)}>Cancel</button>
-          <button className="btn-danger-sm" onClick={confirmDelete} disabled={isSubmitting}>
-            {isSubmitting ? 'Deleting…' : 'Delete'}
-          </button>
+          <button className="btn-secondary-sm" onClick={() => setDeleteOpen(false)} disabled={isSubmitting}>Cancel</button>
+          <Button variant="danger" onClick={confirmDelete} isLoading={isSubmitting} loadingText="Deleting...">
+            Delete
+          </Button>
         </div>
       </Modal>
 
@@ -237,6 +283,16 @@ const Documents: React.FC = () => {
           )}
         </div>
       </Modal>
+
+      <FilePreviewModal 
+        isOpen={previewOpen} 
+        onClose={closePreview} 
+        document={previewDoc} 
+        previewUrl={previewUrl}
+        ownerName={previewOwner}
+        onDownload={handleDownload}
+        onShare={(doc) => { closePreview(); handleShare(doc); }}
+      />
     </div>
   );
 };
