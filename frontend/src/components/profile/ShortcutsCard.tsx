@@ -3,7 +3,8 @@ import { Keyboard } from 'lucide-react';
 import '../ui/Card.css';
 
 const shortcuts = [
-  { keys: ['/', 'Ctrl+K'], description: 'Focus search bar' },
+  { keys: ['Ctrl+K'], description: 'Open Command Palette' },
+  { keys: ['/'], description: 'Focus document search bar' },
   { keys: ['Esc'], description: 'Clear search / Close modals' },
   { keys: ['Ctrl+A'], description: 'Select all documents' },
   { keys: ['Delete'], description: 'Delete selected documents' },

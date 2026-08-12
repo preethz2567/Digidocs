@@ -8,10 +8,10 @@ import { SkeletonTable } from '../components/ui/SkeletonCard';
 import { Modal } from '../components/ui/Modal';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { UploadModal } from '../components/ui/UploadModal';
 import { useToast } from '../components/ui/ToastContext';
 import { FilePreviewModal } from '../components/ui/FilePreviewModal';
 import { addRecentlyViewed } from '../services/recentlyViewedService';
+import { useUiStore } from '../store/uiStore';
 import './Documents.css';
 
 const ITEMS_PER_PAGE = 10;
@@ -29,7 +29,6 @@ const Documents: React.FC = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [uploadOpen, setUploadOpen] = useState(false);
 
   // Modal state
   const [renameOpen, setRenameOpen] = useState(false);
@@ -53,6 +52,7 @@ const Documents: React.FC = () => {
   const [bulkShareLinks, setBulkShareLinks] = useState<string[]>([]);
 
   const { showToast } = useToast();
+  const { setUploadModalOpen } = useUiStore();
 
   const fetchDocuments = async () => {
     setLoading(true);
@@ -141,10 +141,7 @@ const Documents: React.FC = () => {
       const target = e.target as HTMLElement;
       const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA';
 
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        document.getElementById('doc-search-input')?.focus();
-      } else if (!isInput && e.key === '/') {
+      if (!isInput && e.key === '/') {
         e.preventDefault();
         document.getElementById('doc-search-input')?.focus();
       }
@@ -362,7 +359,7 @@ const Documents: React.FC = () => {
             <option>Smallest First</option>
           </select>
         </div>
-        <button className="btn-upload-sm" onClick={() => setUploadOpen(true)}>
+        <button className="btn-upload-sm" onClick={() => setUploadModalOpen(true)}>
           <Plus size={14} strokeWidth={2.5} />
           Upload
         </button>
@@ -387,7 +384,7 @@ const Documents: React.FC = () => {
           description={search ? 'Try adjusting your search.' : 'Upload your first document to get started.'}
           icon={<FileText size={24} strokeWidth={1.5} />}
           action={!search && (
-            <button className="btn-upload-sm" onClick={() => setUploadOpen(true)}>
+            <button className="btn-upload-sm" onClick={() => setUploadModalOpen(true)}>
               <Plus size={14} strokeWidth={2.5} />
               Upload Document
             </button>
@@ -410,8 +407,6 @@ const Documents: React.FC = () => {
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </div>
       )}
-
-      <UploadModal isOpen={uploadOpen} onClose={() => setUploadOpen(false)} onSuccess={() => { setUploadOpen(false); fetchDocuments(); }} />
 
       <Modal isOpen={renameOpen} onClose={() => setRenameOpen(false)} title="Rename Document">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
