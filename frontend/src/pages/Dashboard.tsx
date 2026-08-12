@@ -10,6 +10,7 @@ import { DocumentTable, type DocumentData } from '../components/ui/DocumentTable
 import { SkeletonCard, SkeletonTable } from '../components/ui/SkeletonCard';
 import { EmptyState } from '../components/ui/EmptyState';
 import { UploadModal } from '../components/ui/UploadModal';
+import { StorageAnalytics } from '../components/ui/StorageAnalytics';
 import './Dashboard.css';
 
 const formatBytes = (bytes: number) => {
@@ -184,6 +185,8 @@ const Dashboard: React.FC = () => {
         </div>
 
       </div>
+
+      <StorageAnalytics documents={documents} />
 
       <UploadModal
         isOpen={uploadOpen}

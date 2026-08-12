@@ -1,0 +1,109 @@
+.storage-analytics {
+  background-color: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  padding: 24px;
+  margin-top: 24px;
+}
+
+.storage-analytics__header {
+  margin-bottom: 20px;
+}
+
+.storage-analytics__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.storage-analytics__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.storage-analytics__stat {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #f3f4f6;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.distribution-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 16px;
+}
+
+.distribution-empty {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.distribution-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.distribution-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.distribution-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 100px;
+}
+
+.distribution-type {
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.distribution-count {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.distribution-bar-bg {
+  flex: 1;
+  height: 8px;
+  background-color: #f3f4f6;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.distribution-bar-fill {
+  height: 100%;
+  background-color: #3b82f6;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.distribution-size {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  min-width: 60px;
+  text-align: right;
+}
