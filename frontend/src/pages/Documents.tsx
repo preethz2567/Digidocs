@@ -11,6 +11,7 @@ import { Button } from '../components/ui/Button';
 import { UploadModal } from '../components/ui/UploadModal';
 import { useToast } from '../components/ui/ToastContext';
 import { FilePreviewModal } from '../components/ui/FilePreviewModal';
+import { addRecentlyViewed } from '../services/recentlyViewedService';
 import './Documents.css';
 
 const ITEMS_PER_PAGE = 10;
@@ -80,6 +81,7 @@ const Documents: React.FC = () => {
 
   const handleDownload = async (doc: DocumentData) => {
     try {
+      addRecentlyViewed(doc.id);
       const blob = await documentService.downloadDocument(doc.id);
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -139,6 +141,7 @@ const Documents: React.FC = () => {
   };
 
   const handlePreview = async (doc: DocumentData) => {
+    addRecentlyViewed(doc.id);
     setPreviewDoc(doc);
     setPreviewOpen(true);
     setPreviewUrl(null);
