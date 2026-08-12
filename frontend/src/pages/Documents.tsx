@@ -136,6 +136,39 @@ const Documents: React.FC = () => {
   const handleSelectAll = (all: boolean) =>
     setSelectedIds(all ? paginatedDocs.map(d => d.id) : []);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA';
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        document.getElementById('doc-search-input')?.focus();
+      } else if (!isInput && e.key === '/') {
+        e.preventDefault();
+        document.getElementById('doc-search-input')?.focus();
+      }
+
+      if (e.key === 'Escape') {
+        if (search) setSearch('');
+        else document.getElementById('doc-search-input')?.blur();
+      }
+
+      if (e.key === 'Delete' && !isInput && selectedIds.length > 0) {
+        e.preventDefault();
+        setBulkDeleteOpen(true);
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a' && !isInput) {
+        e.preventDefault();
+        handleSelectAll(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [search, selectedIds, paginatedDocs]);
+
   const handleDownload = async (doc: DocumentData) => {
     try {
       addRecentlyViewed(doc.id);
@@ -296,6 +329,7 @@ const Documents: React.FC = () => {
         <div className="toolbar__search">
           <Search size={14} strokeWidth={2} className="toolbar__search-icon" color="#9ca3af" />
           <input
+            id="doc-search-input"
             type="text"
             placeholder="Search documents..."
             value={search}

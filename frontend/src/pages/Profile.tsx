@@ -2,6 +2,7 @@ import React from 'react';
 import { ProfilePhotoCard } from '../components/profile/ProfilePhotoCard';
 import { PersonalInfoCard } from '../components/profile/PersonalInfoCard';
 import { SecurityCard } from '../components/profile/SecurityCard';
+import { ShortcutsCard } from '../components/profile/ShortcutsCard';
 import './Profile.css';
 
 const Profile: React.FC = () => {
@@ -16,6 +17,7 @@ const Profile: React.FC = () => {
         <ProfilePhotoCard />
         <PersonalInfoCard />
         <SecurityCard />
+        <ShortcutsCard />
       </div>
     </div>
   );
