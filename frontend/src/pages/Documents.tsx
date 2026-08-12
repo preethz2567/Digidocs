@@ -20,6 +20,13 @@ const Documents: React.FC = () => {
   const [documents, setDocuments] = useState<DocumentData[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  
+  // Advanced filters & sort
+  const [filterType, setFilterType] = useState('All Types');
+  const [filterDate, setFilterDate] = useState('All Time');
+  const [filterSize, setFilterSize] = useState('All Sizes');
+  const [sortOrder, setSortOrder] = useState('Newest First');
+
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [uploadOpen, setUploadOpen] = useState(false);
@@ -64,11 +71,56 @@ const Documents: React.FC = () => {
   }, []);
 
   const filteredDocs = useMemo(() => {
-    if (!search.trim()) return documents;
-    return documents.filter(d =>
-      d.originalFileName.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [documents, search]);
+    let result = documents;
+
+    if (search.trim()) {
+      result = result.filter(d => d.originalFileName.toLowerCase().includes(search.toLowerCase()));
+    }
+
+    if (filterType !== 'All Types') {
+      if (filterType === 'PDF') {
+        result = result.filter(d => d.contentType === 'application/pdf');
+      } else if (filterType === 'Images') {
+        result = result.filter(d => d.contentType.startsWith('image/'));
+      } else if (filterType === 'Documents') {
+        result = result.filter(d => d.contentType.includes('word') || d.contentType.includes('document'));
+      }
+    }
+
+    if (filterSize !== 'All Sizes') {
+      if (filterSize === '< 1MB') {
+        result = result.filter(d => d.fileSize < 1024 * 1024);
+      } else if (filterSize === '1MB - 10MB') {
+        result = result.filter(d => d.fileSize >= 1024 * 1024 && d.fileSize <= 10 * 1024 * 1024);
+      } else if (filterSize === '> 10MB') {
+        result = result.filter(d => d.fileSize > 10 * 1024 * 1024);
+      }
+    }
+
+    if (filterDate !== 'All Time') {
+      const now = new Date();
+      if (filterDate === 'Past 24 Hours') {
+        const past24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        result = result.filter(d => new Date(d.uploadedAt) >= past24h);
+      } else if (filterDate === 'Past 7 Days') {
+        const past7d = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        result = result.filter(d => new Date(d.uploadedAt) >= past7d);
+      } else if (filterDate === 'Past 30 Days') {
+        const past30d = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        result = result.filter(d => new Date(d.uploadedAt) >= past30d);
+      }
+    }
+
+    result = [...result].sort((a, b) => {
+      if (sortOrder === 'Newest First') return new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime();
+      if (sortOrder === 'Oldest First') return new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime();
+      if (sortOrder === 'Largest First') return b.fileSize - a.fileSize;
+      if (sortOrder === 'Smallest First') return a.fileSize - b.fileSize;
+      return 0;
+    });
+
+    return result;
+  }, [documents, search, filterType, filterSize, filterDate, sortOrder]);
 
   const totalPages = Math.ceil(filteredDocs.length / ITEMS_PER_PAGE);
   const paginatedDocs = useMemo(() => {
@@ -251,16 +303,29 @@ const Documents: React.FC = () => {
           />
         </div>
         <div className="toolbar__filters">
-          <select className="toolbar__select">
+          <select className="toolbar__select" value={filterType} onChange={e => setFilterType(e.target.value)}>
             <option>All Types</option>
             <option>PDF</option>
             <option>Images</option>
             <option>Documents</option>
           </select>
-          <select className="toolbar__select">
+          <select className="toolbar__select" value={filterDate} onChange={e => setFilterDate(e.target.value)}>
+            <option>All Time</option>
+            <option>Past 24 Hours</option>
+            <option>Past 7 Days</option>
+            <option>Past 30 Days</option>
+          </select>
+          <select className="toolbar__select" value={filterSize} onChange={e => setFilterSize(e.target.value)}>
+            <option>All Sizes</option>
+            <option>&lt; 1MB</option>
+            <option>1MB - 10MB</option>
+            <option>&gt; 10MB</option>
+          </select>
+          <select className="toolbar__select" value={sortOrder} onChange={e => setSortOrder(e.target.value)}>
             <option>Newest First</option>
             <option>Oldest First</option>
             <option>Largest First</option>
+            <option>Smallest First</option>
           </select>
         </div>
         <button className="btn-upload-sm" onClick={() => setUploadOpen(true)}>
