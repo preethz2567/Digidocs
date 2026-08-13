@@ -179,4 +179,24 @@ public DocumentResponse toggleStar(
     return documentService.toggleStar(id, email);
 }
 
+@GetMapping("/download-zip")
+public ResponseEntity<?> downloadMultipleAsZip(
+        @RequestParam List<Long> ids,
+        @RequestHeader("Authorization") String authHeader) {
+
+    String token = authHeader.substring(7);
+    String email = jwtService.extractEmail(token);
+
+    try {
+        Resource resource = documentService.downloadMultipleAsZip(ids, email);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"documents.zip\"")
+                .header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION)
+                .contentType(org.springframework.http.MediaType.parseMediaType("application/zip"))
+                .body(resource);
+    } catch (Exception e) {
+        return ResponseEntity.status(500).body("Failed to create zip file");
+    }
+}
+
 }

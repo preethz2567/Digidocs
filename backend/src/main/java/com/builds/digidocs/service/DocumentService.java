@@ -23,4 +23,5 @@ public interface DocumentService {
     DocumentDownloadResponse downloadSharedDocument(String shareToken);
     void revokeShare(Long id, String email);
     DocumentResponse toggleStar(Long id, String email);
+    Resource downloadMultipleAsZip(List<Long> ids, String email);
 }
