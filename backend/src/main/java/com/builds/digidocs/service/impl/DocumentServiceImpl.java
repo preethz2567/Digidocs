@@ -7,6 +7,9 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+import java.io.FileOutputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -398,5 +401,49 @@ public DocumentResponse toggleStar(Long id, String email) {
             saved.getUploadedAt(),
             saved.isStarred()
     );
+}
+
+@Override
+public Resource downloadMultipleAsZip(List<Long> ids, String email) {
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+    List<Document> documents = documentRepository.findAllById(ids);
+    
+    // Verify ownership
+    for (Document doc : documents) {
+        if (!doc.getUser().getId().equals(user.getId())) {
+            throw new UnauthorizedException("Access denied for document: " + doc.getOriginalFileName());
+        }
+    }
+
+    if (documents.isEmpty()) {
+        throw new InvalidRequestException("No documents found to download");
+    }
+
+    try {
+        Path tempZip = Files.createTempFile("digidocs-export-", ".zip");
+        
+        try (FileOutputStream fos = new FileOutputStream(tempZip.toFile());
+             ZipOutputStream zos = new ZipOutputStream(fos)) {
+            
+            for (Document doc : documents) {
+                Path sourcePath = Paths.get(doc.getFilePath());
+                if (Files.exists(sourcePath)) {
+                    ZipEntry zipEntry = new ZipEntry(doc.getOriginalFileName());
+                    zos.putNextEntry(zipEntry);
+                    Files.copy(sourcePath, zos);
+                    zos.closeEntry();
+                }
+            }
+        }
+        
+        Resource resource = new UrlResource(tempZip.toUri());
+        return resource;
+        
+    } catch (IOException e) {
+        logger.error("Failed to create zip file", e);
+        throw new RuntimeException("Failed to create zip file");
+    }
 }
 }
