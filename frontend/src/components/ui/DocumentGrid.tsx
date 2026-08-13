@@ -15,6 +15,7 @@ interface DocumentGridProps {
   onDownload?: (doc: DocumentData) => void;
   onPreview?: (doc: DocumentData) => void;
   onToggleStar?: (doc: DocumentData) => void;
+  onContextMenu?: (e: React.MouseEvent, doc: DocumentData) => void;
 }
 
 const formatDate = (dateStr: string | undefined) => {
@@ -48,7 +49,8 @@ export const DocumentGrid: React.FC<DocumentGridProps> = ({
   onShare,
   onDownload,
   onPreview,
-  onToggleStar
+  onToggleStar,
+  onContextMenu
 }) => {
   return (
     <div className="document-grid">
@@ -60,6 +62,7 @@ export const DocumentGrid: React.FC<DocumentGridProps> = ({
             key={doc.id} 
             className={`document-card ${isSelected ? 'selected' : ''}`}
             onClick={() => selectable && onSelect && onSelect(doc.id)}
+            onContextMenu={(e) => onContextMenu?.(e, doc)}
           >
             {selectable && (
               <div className="document-card__checkbox" onClick={(e) => e.stopPropagation()}>

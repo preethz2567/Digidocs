@@ -54,8 +54,32 @@ const Documents: React.FC = () => {
   const [bulkShareOpen, setBulkShareOpen] = useState(false);
   const [bulkShareLinks, setBulkShareLinks] = useState<string[]>([]);
 
+  // Context Menu state
+  const [contextMenu, setContextMenu] = useState<{
+    isOpen: boolean;
+    x: number;
+    y: number;
+    doc: DocumentData | null;
+  }>({ isOpen: false, x: 0, y: 0, doc: null });
+
   const { showToast } = useToast();
   const { setUploadModalOpen } = useUiStore();
+
+  const handleContextMenu = (e: React.MouseEvent, doc: DocumentData) => {
+    e.preventDefault();
+    setContextMenu({
+      isOpen: true,
+      x: e.clientX,
+      y: e.clientY,
+      doc
+    });
+  };
+
+  useEffect(() => {
+    const handleClick = () => setContextMenu(prev => ({ ...prev, isOpen: false }));
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, []);
 
   const fetchDocuments = async () => {
     setLoading(true);
@@ -440,6 +464,7 @@ const Documents: React.FC = () => {
               onDelete={doc => { setActiveDoc(doc); setDeleteOpen(true); }}
               onShare={handleShare}
               onToggleStar={handleToggleStar}
+              onContextMenu={handleContextMenu}
             />
           ) : (
             <DocumentGrid
@@ -453,6 +478,7 @@ const Documents: React.FC = () => {
               onDelete={doc => { setActiveDoc(doc); setDeleteOpen(true); }}
               onShare={handleShare}
               onToggleStar={handleToggleStar}
+              onContextMenu={handleContextMenu}
             />
           )}
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
@@ -541,6 +567,52 @@ const Documents: React.FC = () => {
         onDownload={handleDownload}
         onShare={(doc) => { closePreview(); handleShare(doc); }}
       />
+
+      {contextMenu.isOpen && contextMenu.doc && (
+        <div
+          style={{
+            position: 'fixed',
+            top: contextMenu.y,
+            left: contextMenu.x,
+            zIndex: 1000,
+            background: 'white',
+            border: '1px solid #e5e7eb',
+            borderRadius: '6px',
+            boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)',
+            padding: '4px',
+            minWidth: '160px',
+            display: 'flex',
+            flexDirection: 'column'
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button 
+            className="action-menu__item"
+            onClick={() => { setContextMenu({ ...contextMenu, isOpen: false }); handlePreview(contextMenu.doc!); }}
+          >Preview</button>
+          <button 
+            className="action-menu__item"
+            onClick={() => { setContextMenu({ ...contextMenu, isOpen: false }); handleDownload(contextMenu.doc!); }}
+          >Download</button>
+          <button 
+            className="action-menu__item"
+            onClick={() => { setContextMenu({ ...contextMenu, isOpen: false }); handleShare(contextMenu.doc!); }}
+          >Share</button>
+          <button 
+            className="action-menu__item"
+            onClick={() => { setContextMenu({ ...contextMenu, isOpen: false }); handleToggleStar(contextMenu.doc!); }}
+          >{contextMenu.doc.isStarred ? 'Unstar' : 'Star'}</button>
+          <div className="action-menu__divider"></div>
+          <button 
+            className="action-menu__item"
+            onClick={() => { setContextMenu({ ...contextMenu, isOpen: false }); setActiveDoc(contextMenu.doc); setNewName(contextMenu.doc!.originalFileName); setRenameOpen(true); }}
+          >Rename</button>
+          <button 
+            className="action-menu__item action-menu__item--danger"
+            onClick={() => { setContextMenu({ ...contextMenu, isOpen: false }); setActiveDoc(contextMenu.doc); setDeleteOpen(true); }}
+          >Delete</button>
+        </div>
+      )}
     </div>
   );
 };

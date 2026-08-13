@@ -25,6 +25,7 @@ interface DocumentTableProps {
   onDownload?: (doc: DocumentData) => void;
   onPreview?: (doc: DocumentData) => void;
   onToggleStar?: (doc: DocumentData) => void;
+  onContextMenu?: (e: React.MouseEvent, doc: DocumentData) => void;
 }
 
 const formatDate = (dateStr: string | undefined) => {
@@ -59,7 +60,8 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({
   onShare,
   onDownload,
   onPreview,
-  onToggleStar
+  onToggleStar,
+  onContextMenu
 }) => {
   const allSelected = documents.length > 0 && selectedIds.length === documents.length;
 
@@ -88,7 +90,11 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({
           {documents.map((doc) => {
             const isSelected = selectedIds.includes(doc.id);
             return (
-              <tr key={doc.id} className={isSelected ? 'selected' : ''}>
+              <tr 
+                key={doc.id} 
+                className={isSelected ? 'selected' : ''}
+                onContextMenu={(e) => onContextMenu?.(e, doc)}
+              >
                 {selectable && (
                   <td className="doc-table__col-checkbox">
                     <input
