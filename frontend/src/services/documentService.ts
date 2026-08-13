@@ -77,6 +77,13 @@ const toggleStar = async (id: number) => {
   return response.data;
 };
 
+const downloadMultipleAsZip = async (ids: number[]) => {
+  const response = await api.get(`/documents/download-zip?ids=${ids.join(",")}`, {
+    responseType: "blob",
+  });
+  return response.data;
+};
+
 const documentService = {
   getDocuments,
   uploadDocument,
@@ -88,6 +95,7 @@ const documentService = {
   shareDocument,
   revokeShare,
   toggleStar,
+  downloadMultipleAsZip,
 };
 
 /**

@@ -243,21 +243,21 @@ const Documents: React.FC = () => {
 
   const handleBulkDownload = async () => {
     try {
-      await Promise.all(selectedIds.map(async (id) => {
-        const doc = documents.find(d => d.id === id);
-        if (!doc) return;
-        addRecentlyViewed(id);
-        const blob = await documentService.downloadDocument(id);
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = doc.originalFileName;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-      }));
+      showToast('Preparing zip file...', 'success');
+      selectedIds.forEach(id => addRecentlyViewed(id));
+      
+      const blob = await documentService.downloadMultipleAsZip(selectedIds);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'documents.zip';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      
+      showToast('Download started.', 'success');
     } catch {
-      showToast('Some downloads failed.', 'error');
+      showToast('Failed to download documents.', 'error');
     }
   };
 
