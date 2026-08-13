@@ -10,6 +10,7 @@ export interface DocumentData {
   fileSize: number;
   contentType: string;
   uploadedAt: string;
+  isStarred?: boolean;
 }
 
 interface DocumentTableProps {
@@ -23,6 +24,7 @@ interface DocumentTableProps {
   onShare?: (doc: DocumentData) => void;
   onDownload?: (doc: DocumentData) => void;
   onPreview?: (doc: DocumentData) => void;
+  onToggleStar?: (doc: DocumentData) => void;
 }
 
 const formatDate = (dateStr: string | undefined) => {
@@ -56,7 +58,8 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({
   onDelete,
   onShare,
   onDownload,
-  onPreview
+  onPreview,
+  onToggleStar
 }) => {
   const allSelected = documents.length > 0 && selectedIds.length === documents.length;
 
@@ -75,6 +78,7 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({
               </th>
             )}
             <th className="doc-table__col-file">Name</th>
+            <th style={{ width: '40px' }}></th>
             <th>Size</th>
             <th>Uploaded</th>
             <th className="doc-table__col-actions"></th>
@@ -107,6 +111,25 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({
                       {doc.originalFileName}
                     </span>
                   </div>
+                </td>
+                <td style={{ textAlign: 'center' }}>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); onToggleStar?.(doc); }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill={doc.isStarred ? "#eab308" : "none"}
+                      stroke={doc.isStarred ? "#eab308" : "#9ca3af"}
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                  </button>
                 </td>
                 <td>{formatSize(doc.fileSize)}</td>
                 <td>{formatDate(doc.uploadedAt)}</td>

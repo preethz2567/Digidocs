@@ -72,6 +72,11 @@ const revokeShare = async (id: number) => {
   return response.data;
 };
 
+const toggleStar = async (id: number) => {
+  const response = await api.put(`/documents/${id}/star`);
+  return response.data;
+};
+
 const documentService = {
   getDocuments,
   uploadDocument,
@@ -82,6 +87,7 @@ const documentService = {
   getMetadata,
   shareDocument,
   revokeShare,
+  toggleStar,
 };
 
 /**
