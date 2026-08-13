@@ -87,6 +87,8 @@ const Documents: React.FC = () => {
         result = result.filter(d => d.contentType.startsWith('image/'));
       } else if (filterType === 'Documents') {
         result = result.filter(d => d.contentType.includes('word') || d.contentType.includes('document'));
+      } else if (filterType === 'Starred') {
+        result = result.filter(d => d.isStarred);
       }
     }
 
@@ -182,6 +184,15 @@ const Documents: React.FC = () => {
       window.URL.revokeObjectURL(url);
     } catch {
       showToast('Download failed.', 'error');
+    }
+  };
+
+  const handleToggleStar = async (doc: DocumentData) => {
+    try {
+      const updated = await documentService.toggleStar(doc.id);
+      setDocuments(d => d.map(d => d.id === doc.id ? updated : d));
+    } catch {
+      showToast('Failed to update star status.', 'error');
     }
   };
 
@@ -339,6 +350,7 @@ const Documents: React.FC = () => {
         <div className="toolbar__filters">
           <select className="toolbar__select" value={filterType} onChange={e => setFilterType(e.target.value)}>
             <option>All Types</option>
+            <option>Starred</option>
             <option>PDF</option>
             <option>Images</option>
             <option>Documents</option>
@@ -427,6 +439,7 @@ const Documents: React.FC = () => {
               onRename={doc => { setActiveDoc(doc); setNewName(doc.originalFileName); setRenameOpen(true); }}
               onDelete={doc => { setActiveDoc(doc); setDeleteOpen(true); }}
               onShare={handleShare}
+              onToggleStar={handleToggleStar}
             />
           ) : (
             <DocumentGrid
@@ -439,6 +452,7 @@ const Documents: React.FC = () => {
               onRename={doc => { setActiveDoc(doc); setNewName(doc.originalFileName); setRenameOpen(true); }}
               onDelete={doc => { setActiveDoc(doc); setDeleteOpen(true); }}
               onShare={handleShare}
+              onToggleStar={handleToggleStar}
             />
           )}
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />

@@ -168,4 +168,15 @@ public ResponseEntity<?> downloadSharedDocumentPublic(@PathVariable String share
     }
 }
 
+@PutMapping("/{id}/star")
+public DocumentResponse toggleStar(
+        @PathVariable Long id,
+        @RequestHeader("Authorization") String authHeader) {
+
+    String token = authHeader.substring(7);
+    String email = jwtService.extractEmail(token);
+
+    return documentService.toggleStar(id, email);
+}
+
 }
