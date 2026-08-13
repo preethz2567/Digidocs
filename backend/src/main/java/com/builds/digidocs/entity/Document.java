@@ -40,6 +40,17 @@ public class Document {
     @Column
     private LocalDateTime shareExpiry;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean isStarred;
+
+    public boolean isStarred() {
+        return isStarred;
+    }
+
+    public void setStarred(boolean starred) {
+        isStarred = starred;
+    }
+
     public LocalDateTime getShareExpiry() {
         return shareExpiry;
     }

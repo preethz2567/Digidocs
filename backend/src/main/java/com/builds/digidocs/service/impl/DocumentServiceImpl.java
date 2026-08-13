@@ -107,7 +107,8 @@ if (!allowedTypes.contains(file.getContentType())) {
                     saved.getOriginalFileName(),
                     saved.getFileSize(),
                     saved.getContentType(),
-                    saved.getUploadedAt()
+                    saved.getUploadedAt(),
+                    saved.isStarred()
             );
 
         } catch (IOException e) {
@@ -146,7 +147,8 @@ public List<DocumentResponse> getDocuments(String email, String sort) {
                     document.getOriginalFileName(),
                     document.getFileSize(),
                     document.getContentType(),
-                    document.getUploadedAt()
+                    document.getUploadedAt(),
+                    document.isStarred()
             ))
             .toList();
 }
@@ -226,7 +228,8 @@ public List<DocumentResponse> searchDocuments(String email, String keyword) {
                     document.getOriginalFileName(),
                     document.getFileSize(),
                     document.getContentType(),
-                    document.getUploadedAt()
+                    document.getUploadedAt(),
+                    document.isStarred()
             ))
             .toList();
 }
@@ -256,7 +259,8 @@ public DocumentResponse renameDocument(Long id, String email, String newName) {
             saved.getOriginalFileName(),
             saved.getFileSize(),
             saved.getContentType(),
-            saved.getUploadedAt()
+            saved.getUploadedAt(),
+            saved.isStarred()
     );
 }
 
@@ -282,7 +286,8 @@ public DocumentResponse getDocument(Long id, String email) {
             document.getOriginalFileName(),
             document.getFileSize(),
             document.getContentType(),
-            document.getUploadedAt()
+            document.getUploadedAt(),
+            document.isStarred()
     );
 }
 
@@ -364,5 +369,34 @@ public void revokeShare(Long id, String email) {
     logger.info("Share link revoked for document {} by {}",
             document.getId(),
             email);
+}
+
+@Override
+public DocumentResponse toggleStar(Long id, String email) {
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+    Document document = documentRepository.findById(id)
+            .orElseThrow(() -> new DocumentNotFoundException("Document not found"));
+
+    if (!document.getUser().getId().equals(user.getId())) {
+        throw new UnauthorizedException("Access denied");
+    }
+
+    document.setStarred(!document.isStarred());
+    Document saved = documentRepository.save(document);
+
+    logger.info("Document {} starred status toggled to {} by {}",
+            saved.getId(), saved.isStarred(), email);
+
+    return new DocumentResponse(
+            saved.getId(),
+            saved.getOriginalFileName(),
+            saved.getFileSize(),
+            saved.getContentType(),
+            saved.getUploadedAt(),
+            saved.isStarred()
+    );
 }
 }

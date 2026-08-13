@@ -15,12 +15,15 @@ public class DocumentResponse {
 
     private LocalDateTime uploadedAt;
 
-    public DocumentResponse(Long id, String originalFileName, Long fileSize, String contentType, LocalDateTime uploadedAt) {
+    private boolean isStarred;
+
+    public DocumentResponse(Long id, String originalFileName, Long fileSize, String contentType, LocalDateTime uploadedAt, boolean isStarred) {
         this.id = id;
         this.originalFileName = originalFileName;
         this.fileSize = fileSize;
         this.contentType = contentType;
         this.uploadedAt = uploadedAt;
+        this.isStarred = isStarred;
     }
 
     public Long getId() {
@@ -61,5 +64,13 @@ public class DocumentResponse {
 
     public void setUploadedAt(LocalDateTime uploadedAt) {
         this.uploadedAt = uploadedAt;
+    }
+
+    public boolean isStarred() {
+        return isStarred;
+    }
+
+    public void setStarred(boolean starred) {
+        isStarred = starred;
     }
 }
