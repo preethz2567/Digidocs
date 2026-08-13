@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Plus, FileText } from 'lucide-react';
+import { Search, Plus, FileText, LayoutGrid, List } from 'lucide-react';
 import documentService from '../services/documentService';
 import { DocumentTable, type DocumentData } from '../components/ui/DocumentTable';
+import { DocumentGrid } from '../components/ui/DocumentGrid';
 import { Pagination } from '../components/ui/Pagination';
 import { EmptyState } from '../components/ui/EmptyState';
 import { SkeletonTable } from '../components/ui/SkeletonCard';
@@ -21,6 +22,8 @@ const Documents: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+
   // Advanced filters & sort
   const [filterType, setFilterType] = useState('All Types');
   const [filterDate, setFilterDate] = useState('All Time');
@@ -358,6 +361,26 @@ const Documents: React.FC = () => {
             <option>Largest First</option>
             <option>Smallest First</option>
           </select>
+          
+          <div className="view-toggle-group" style={{ display: 'flex', border: '1px solid #e5e7eb', borderRadius: '6px', overflow: 'hidden' }}>
+            <button 
+              className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+              onClick={() => setViewMode('list')}
+              style={{ padding: '6px 8px', background: viewMode === 'list' ? '#f3f4f6' : '#ffffff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+              title="List View"
+            >
+              <List size={16} color={viewMode === 'list' ? '#111827' : '#6b7280'} />
+            </button>
+            <div style={{ width: '1px', backgroundColor: '#e5e7eb' }}></div>
+            <button 
+              className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+              onClick={() => setViewMode('grid')}
+              style={{ padding: '6px 8px', background: viewMode === 'grid' ? '#f3f4f6' : '#ffffff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+              title="Grid View"
+            >
+              <LayoutGrid size={16} color={viewMode === 'grid' ? '#111827' : '#6b7280'} />
+            </button>
+          </div>
         </div>
         <button className="btn-upload-sm" onClick={() => setUploadModalOpen(true)}>
           <Plus size={14} strokeWidth={2.5} />
@@ -392,18 +415,32 @@ const Documents: React.FC = () => {
         />
       ) : (
         <div className="documents-page__table-wrapper">
-          <DocumentTable
-            documents={paginatedDocs}
-            selectable
-            selectedIds={selectedIds}
-            onSelect={handleSelect}
-            onSelectAll={handleSelectAll}
-            onDownload={handleDownload}
-            onPreview={handlePreview}
-            onRename={doc => { setActiveDoc(doc); setNewName(doc.originalFileName); setRenameOpen(true); }}
-            onDelete={doc => { setActiveDoc(doc); setDeleteOpen(true); }}
-            onShare={handleShare}
-          />
+          {viewMode === 'list' ? (
+            <DocumentTable
+              documents={paginatedDocs}
+              selectable
+              selectedIds={selectedIds}
+              onSelect={handleSelect}
+              onSelectAll={handleSelectAll}
+              onDownload={handleDownload}
+              onPreview={handlePreview}
+              onRename={doc => { setActiveDoc(doc); setNewName(doc.originalFileName); setRenameOpen(true); }}
+              onDelete={doc => { setActiveDoc(doc); setDeleteOpen(true); }}
+              onShare={handleShare}
+            />
+          ) : (
+            <DocumentGrid
+              documents={paginatedDocs}
+              selectable
+              selectedIds={selectedIds}
+              onSelect={handleSelect}
+              onDownload={handleDownload}
+              onPreview={handlePreview}
+              onRename={doc => { setActiveDoc(doc); setNewName(doc.originalFileName); setRenameOpen(true); }}
+              onDelete={doc => { setActiveDoc(doc); setDeleteOpen(true); }}
+              onShare={handleShare}
+            />
+          )}
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </div>
       )}
