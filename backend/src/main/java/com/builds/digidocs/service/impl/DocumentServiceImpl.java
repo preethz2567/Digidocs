@@ -143,7 +143,7 @@ public List<DocumentResponse> getDocuments(String email, String sort) {
             break;
     }
 
-    return documentRepository.findByUser(user, sorting)
+    return documentRepository.findByUserAndDeletedAtIsNull(user, sorting)
             .stream()
             .map(document -> new DocumentResponse(
                     document.getId(),
@@ -164,7 +164,7 @@ public DocumentDownloadResponse downloadDocument(Long id, String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
         Document document = documentRepository
-                .findByIdAndUser(id, user)
+                .findByIdAndUserAndDeletedAtIsNull(id, user)
                 .orElseThrow(() -> new DocumentNotFoundException("Document not found"));
 
         Path path = Paths.get(document.getFilePath());

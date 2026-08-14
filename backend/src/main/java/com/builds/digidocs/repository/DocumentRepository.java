@@ -22,4 +22,6 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
 
     List<Document> findByUserAndDeletedAtIsNotNull(User user, Sort sort);
 
+    Optional<Document> findByIdAndUserAndDeletedAtIsNotNull(Long id, User user);
+
 }
