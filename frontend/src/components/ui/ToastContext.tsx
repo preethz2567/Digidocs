@@ -79,7 +79,7 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
               fontSize: '13px',
               fontWeight: 500,
               fontFamily: 'inherit',
-              borderRadius: '6px',
+              borderRadius: 0,
               boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
               minWidth: '260px',
               maxWidth: '360px',

@@ -49,7 +49,7 @@ const ForgotPassword: React.FC = () => {
             height: '40px',
             backgroundColor: 'var(--text-primary)',
             color: '#ffffff',
-            borderRadius: 'var(--radius-sm)',
+            borderRadius: 0,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -70,7 +70,7 @@ const ForgotPassword: React.FC = () => {
 
         {isSuccess ? (
           <div style={{ textAlign: 'center' }}>
-            <div style={{ backgroundColor: 'var(--success-color)', color: 'white', padding: 'var(--space-4)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-6)' }}>
+            <div style={{ backgroundColor: 'var(--success-color)', color: 'white', padding: 'var(--space-4)', borderRadius: 0, marginBottom: 'var(--space-6)' }}>
               Check your email for a link to reset your password.
             </div>
             <Link to="/" style={{ fontWeight: 600 }}>

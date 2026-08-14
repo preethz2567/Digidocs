@@ -4,7 +4,7 @@
 .stats-card {
   background: #ffffff;
   border: 1px solid #e5e7eb;
-  border-radius: 6px;
+  border-radius: 0;
   padding: 20px 22px;
   display: flex;
   flex-direction: column;
@@ -28,7 +28,7 @@
 .stats-card__icon {
   width: 32px;
   height: 32px;
-  border-radius: 6px;
+  border-radius: 0;
   background: #f9fafb;
   border: 1px solid #f0f0f0;
   display: flex;

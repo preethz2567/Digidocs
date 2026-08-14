@@ -1,6 +1,6 @@
 .storage-analytics {
   background-color: #ffffff;
-  border-radius: 8px;
+  border-radius: 0;
   border: 1px solid #e5e7eb;
   padding: 24px;
   margin-top: 24px;
@@ -28,7 +28,7 @@
   flex-direction: column;
   padding: 16px;
   background-color: #f9fafb;
-  border-radius: 8px;
+  border-radius: 0;
   border: 1px solid #f3f4f6;
 }
 
@@ -89,14 +89,14 @@
   flex: 1;
   height: 8px;
   background-color: #f3f4f6;
-  border-radius: 4px;
+  border-radius: 0;
   overflow: hidden;
 }
 
 .distribution-bar-fill {
   height: 100%;
   background-color: #3b82f6;
-  border-radius: 4px;
+  border-radius: 0;
   transition: width 0.3s ease;
 }
 

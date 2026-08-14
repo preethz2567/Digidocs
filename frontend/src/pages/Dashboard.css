@@ -88,7 +88,7 @@
 .dashboard__table-wrapper {
   background: #ffffff;
   border: 1px solid #e5e7eb;
-  border-radius: 6px;
+  border-radius: 0;
   overflow: visible;
 }
 
@@ -102,7 +102,7 @@
   background: #111827;
   color: #ffffff;
   border: none;
-  border-radius: 6px;
+  border-radius: 0;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;

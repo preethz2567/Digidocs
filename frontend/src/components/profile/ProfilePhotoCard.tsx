@@ -68,11 +68,11 @@ export const ProfilePhotoCard: React.FC = () => {
             <img 
               src={user.avatarUrl} 
               alt="Profile" 
-              style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #e5e7eb' }} 
+              style={{ width: '80px', height: '80px', borderRadius: 0, objectFit: 'cover', border: '1px solid #e5e7eb' }} 
             />
           ) : (
             <div style={{ 
-              width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#f3f4f6', 
+              width: '80px', height: '80px', borderRadius: 0, backgroundColor: '#f3f4f6', 
               display: 'flex', alignItems: 'center', justifyContent: 'center', 
               fontSize: '24px', fontWeight: 600, color: '#4b5563', border: '1px solid #e5e7eb' 
             }}>
@@ -80,7 +80,7 @@ export const ProfilePhotoCard: React.FC = () => {
             </div>
           )}
           {isUploading && (
-            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: '50%' }}>
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 0 }}>
               <Loader2 size={24} className="animate-spin" color="#111827" />
             </div>
           )}
@@ -109,7 +109,7 @@ export const ProfilePhotoCard: React.FC = () => {
                 className="btn-danger" 
                 onClick={handleDelete}
                 disabled={isUploading || isDeleting}
-                style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'transparent', border: '1px solid #fee2e2', color: '#ef4444', padding: '8px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: 500, cursor: 'pointer' }}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'transparent', border: '1px solid #fee2e2', color: '#ef4444', padding: '8px 16px', borderRadius: 0, fontSize: '13px', fontWeight: 500, cursor: 'pointer' }}
               >
                 {isDeleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />} Remove Photo
               </button>

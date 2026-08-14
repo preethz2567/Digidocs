@@ -226,7 +226,7 @@ const Trash: React.FC = () => {
             zIndex: 1000,
             background: 'white',
             border: '1px solid #e5e7eb',
-            borderRadius: '6px',
+            borderRadius: 0,
             boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)',
             padding: '4px',
             minWidth: '160px',

@@ -43,7 +43,7 @@ class ErrorBoundary extends React.Component<
             <div style={{
               width: '56px',
               height: '56px',
-              borderRadius: '6px',
+              borderRadius: 0,
               background: '#fff7ed',
               border: '1px solid #fed7aa',
               display: 'flex',
@@ -68,7 +68,7 @@ class ErrorBoundary extends React.Component<
                 background: '#111827',
                 color: '#ffffff',
                 border: '1px solid #111827',
-                borderRadius: '6px',
+                borderRadius: 0,
                 fontSize: '13px',
                 fontWeight: 500,
                 cursor: 'pointer',

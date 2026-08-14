@@ -54,7 +54,7 @@ const SharedDocument: React.FC = () => {
       <div style={{
         background: '#ffffff',
         border: '1px solid #e5e7eb',
-        borderRadius: '6px',
+        borderRadius: 0,
         padding: '48px 40px',
         maxWidth: '420px',
         width: '100%',
@@ -62,7 +62,7 @@ const SharedDocument: React.FC = () => {
       }}>
         {state === 'loading' && (
           <>
-            <div style={{ width: '48px', height: '48px', borderRadius: '6px', background: '#f9fafb', border: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', color: '#9ca3af' }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: 0, background: '#f9fafb', border: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', color: '#9ca3af' }}>
               <FileText size={22} strokeWidth={1.5} />
             </div>
             <p style={{ fontSize: '14px', color: '#6b7280' }}>Loading document…</p>
@@ -71,7 +71,7 @@ const SharedDocument: React.FC = () => {
 
         {state === 'ready' && (
           <>
-            <div style={{ width: '52px', height: '52px', borderRadius: '6px', background: '#f9fafb', border: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', color: '#374151' }}>
+            <div style={{ width: '52px', height: '52px', borderRadius: 0, background: '#f9fafb', border: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', color: '#374151' }}>
               <FileText size={24} strokeWidth={1.5} />
             </div>
             <p style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#9ca3af', marginBottom: '8px' }}>
@@ -94,7 +94,7 @@ const SharedDocument: React.FC = () => {
                 background: '#111827',
                 color: '#ffffff',
                 border: '1px solid #111827',
-                borderRadius: '6px',
+                borderRadius: 0,
                 fontSize: '13px',
                 fontWeight: 500,
                 cursor: 'pointer',
@@ -109,7 +109,7 @@ const SharedDocument: React.FC = () => {
 
         {state === 'expired' && (
           <>
-            <div style={{ width: '48px', height: '48px', borderRadius: '6px', background: '#fff7ed', border: '1px solid #fed7aa', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', color: '#ea580c' }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: 0, background: '#fff7ed', border: '1px solid #fed7aa', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', color: '#ea580c' }}>
               <Clock size={22} strokeWidth={1.5} />
             </div>
             <h2 style={{ fontSize: '16px', fontWeight: 600, color: '#111827', marginBottom: '8px' }}>
@@ -123,7 +123,7 @@ const SharedDocument: React.FC = () => {
 
         {state === 'invalid' && (
           <>
-            <div style={{ width: '48px', height: '48px', borderRadius: '6px', background: '#fef2f2', border: '1px solid #fecaca', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', color: '#dc2626' }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: 0, background: '#fef2f2', border: '1px solid #fecaca', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', color: '#dc2626' }}>
               <AlertCircle size={22} strokeWidth={1.5} />
             </div>
             <h2 style={{ fontSize: '16px', fontWeight: 600, color: '#111827', marginBottom: '8px' }}>

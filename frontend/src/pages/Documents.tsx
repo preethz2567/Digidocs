@@ -398,7 +398,7 @@ const Documents: React.FC = () => {
             <option>Smallest First</option>
           </select>
           
-          <div className="view-toggle-group" style={{ display: 'flex', border: '1px solid #e5e7eb', borderRadius: '6px', overflow: 'hidden' }}>
+          <div className="view-toggle-group" style={{ display: 'flex', border: '1px solid #e5e7eb', borderRadius: 0, overflow: 'hidden' }}>
             <button 
               className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
               onClick={() => setViewMode('list')}
@@ -577,7 +577,7 @@ const Documents: React.FC = () => {
             zIndex: 1000,
             background: 'white',
             border: '1px solid #e5e7eb',
-            borderRadius: '6px',
+            borderRadius: 0,
             boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)',
             padding: '4px',
             minWidth: '160px',

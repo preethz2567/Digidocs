@@ -9,7 +9,7 @@ export const Loader: React.FC = () => {
           height: '24px',
           border: '2px solid var(--border-color)',
           borderTopColor: 'var(--text-primary)',
-          borderRadius: '50%',
+          borderRadius: 0,
           animation: 'btn-spin 0.6s linear infinite',
         }}
       />

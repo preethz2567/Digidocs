@@ -2,7 +2,7 @@
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(2px);
+  
   display: flex;
   align-items: center;
   justify-content: center;
@@ -14,7 +14,7 @@
   background: #ffffff;
   width: 100%;
   max-width: 460px;
-  border-radius: 6px;
+  border-radius: 0;
   border: 1px solid #e5e7eb;
   box-shadow: 0 20px 60px rgba(0,0,0,0.15);
   animation: slideUp 150ms ease;
@@ -47,7 +47,7 @@
   color: #9ca3af;
   cursor: pointer;
   padding: 4px;
-  border-radius: 4px;
+  border-radius: 0;
   display: flex;
   align-items: center;
   transition: all 150ms ease;
@@ -75,7 +75,7 @@
 /* Dropzone */
 .upload-dropzone {
   border: 2px dashed #e5e7eb;
-  border-radius: 6px;
+  border-radius: 0;
   padding: 40px 20px;
   display: flex;
   flex-direction: column;
@@ -95,7 +95,7 @@
 .upload-dropzone__icon {
   width: 44px;
   height: 44px;
-  border-radius: 6px;
+  border-radius: 0;
   background: #f3f4f6;
   border: 1px solid #e5e7eb;
   display: flex;
@@ -131,7 +131,7 @@
   color: #fff;
   border: none;
   padding: 7px 16px;
-  border-radius: 6px;
+  border-radius: 0;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -159,14 +159,14 @@
   gap: 12px;
   padding: 14px;
   border: 1px solid #e5e7eb;
-  border-radius: 6px;
+  border-radius: 0;
   background: #fafafa;
 }
 
 .upload-file-preview__icon {
   width: 36px;
   height: 36px;
-  border-radius: 6px;
+  border-radius: 0;
   background: #f3f4f6;
   border: 1px solid #e5e7eb;
   display: flex;
@@ -214,7 +214,7 @@
   color: #9ca3af;
   cursor: pointer;
   padding: 4px;
-  border-radius: 4px;
+  border-radius: 0;
   display: flex;
   align-items: center;
   transition: all 150ms ease;
@@ -243,14 +243,14 @@
 .upload-progress__bar {
   height: 4px;
   background: #e5e7eb;
-  border-radius: 99px;
+  border-radius: 0;
   overflow: hidden;
 }
 
 .upload-progress__fill {
   height: 100%;
   background: #111827;
-  border-radius: 99px;
+  border-radius: 0;
   transition: width 150ms ease;
 }
 
@@ -274,7 +274,7 @@
   padding: 0 14px;
   background: #fff;
   border: 1px solid #e5e7eb;
-  border-radius: 6px;
+  border-radius: 0;
   font-size: 13px;
   font-weight: 500;
   color: #374151;
@@ -298,7 +298,7 @@
   background: #111827;
   color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 0;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;

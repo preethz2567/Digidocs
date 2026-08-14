@@ -94,7 +94,7 @@ const Login: React.FC = () => {
             height: '40px',
             backgroundColor: 'var(--text-primary)',
             color: '#ffffff',
-            borderRadius: 'var(--radius-sm)',
+            borderRadius: 0,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -115,7 +115,7 @@ const Login: React.FC = () => {
           <div role="alert" style={{
             backgroundColor: 'var(--error-bg)',
             border: '1px solid rgba(220,38,38,0.2)',
-            borderRadius: 'var(--radius-md)',
+            borderRadius: 0,
             padding: '12px 14px',
             marginBottom: 'var(--space-5)',
             display: 'flex',

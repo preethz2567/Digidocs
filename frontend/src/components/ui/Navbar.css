@@ -37,7 +37,7 @@
   height: 32px;
   padding: 0 12px 0 32px;
   border: 1px solid #e5e7eb;
-  border-radius: 6px;
+  border-radius: 0;
   background: #fafafa;
   color: #111827;
   font-size: 13px;
@@ -67,7 +67,7 @@
   border: none;
   width: 32px;
   height: 32px;
-  border-radius: 6px;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -102,7 +102,7 @@
   gap: 8px;
   padding: 3px 8px 3px 4px;
   border: 1px solid #e5e7eb;
-  border-radius: 6px;
+  border-radius: 0;
   background: transparent;
   cursor: pointer;
   transition: all 150ms ease;
@@ -122,7 +122,7 @@
 .navbar__avatar {
   width: 26px;
   height: 26px;
-  border-radius: 4px;
+  border-radius: 0;
   background-color: #111827;
   color: #fff;
   display: flex;
@@ -136,7 +136,7 @@
 .navbar__avatar-img {
   width: 28px;
   height: 28px;
-  border-radius: 50%;
+  border-radius: 0;
   object-fit: cover;
   border: 1px solid #e5e7eb;
 }
@@ -168,7 +168,7 @@
   min-width: 200px;
   background-color: #ffffff;
   border: 1px solid #e5e7eb;
-  border-radius: 6px;
+  border-radius: 0;
   box-shadow: 0 4px 14px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.06);
   padding: 4px;
   z-index: 60;
@@ -215,7 +215,7 @@
   font-size: 13px;
   font-weight: 500;
   text-align: left;
-  border-radius: 5px;
+  border-radius: 0;
   cursor: pointer;
   transition: all 150ms ease;
   font-family: inherit;

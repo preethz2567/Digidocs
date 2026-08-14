@@ -32,7 +32,7 @@ export const ShortcutsCard: React.FC = () => {
                     padding: '4px 8px', 
                     background: '#f3f4f6', 
                     border: '1px solid #d1d5db', 
-                    borderRadius: 4, 
+                    borderRadius: 0, 
                     fontSize: 12, 
                     color: '#4b5563', 
                     fontFamily: 'monospace' 

@@ -24,7 +24,7 @@
   height: 32px;
   background-color: var(--text-primary);
   color: #ffffff;
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   flex-shrink: 0;
 }
 

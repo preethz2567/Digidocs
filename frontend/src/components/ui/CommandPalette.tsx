@@ -1,8 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Home, FileText, Upload, User, LogOut } from 'lucide-react';
+import { Search, Home, FileText, Upload, User, LogOut, Download } from 'lucide-react';
 import { useUiStore } from '../../store/uiStore';
 import useAuthStore from '../../store/authStore';
+import documentService from '../../services/documentService';
+import { type DocumentData } from './DocumentTable';
 import './CommandPalette.css';
 
 interface Command {
@@ -19,15 +21,38 @@ export const CommandPalette: React.FC = () => {
   const { logout } = useAuthStore();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [documents, setDocuments] = useState<DocumentData[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
+
+  useEffect(() => {
+    if (isCommandPaletteOpen) {
+      documentService.getDocuments().then(data => setDocuments(data)).catch(console.error);
+    }
+  }, [isCommandPaletteOpen]);
 
   const close = () => {
     setCommandPaletteOpen(false);
     setQuery('');
   };
 
-  const commands: Command[] = [
+  const downloadDoc = async (doc: DocumentData) => {
+    try {
+      const blob = await documentService.downloadDocument(doc.id);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = doc.originalFileName;
+      document.body.appendChild(link);
+      link.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error('Download failed', err);
+    }
+  };
+
+  const staticCommands: Command[] = [
     {
       id: 'nav-dashboard',
       name: 'Go to Dashboard',
@@ -61,10 +86,7 @@ export const CommandPalette: React.FC = () => {
       name: 'Search Documents...',
       icon: <Search size={16} />,
       section: 'Actions',
-      action: () => {
-        // Just go to documents page, you can focus search manually
-        navigate('/documents');
-      },
+      action: () => navigate('/documents'),
     },
     {
       id: 'action-logout',
@@ -75,7 +97,17 @@ export const CommandPalette: React.FC = () => {
     },
   ];
 
-  const filteredCommands = commands.filter((cmd) =>
+  const documentCommands: Command[] = documents.map(doc => ({
+    id: `doc-${doc.id}`,
+    name: doc.originalFileName,
+    icon: <Download size={16} />,
+    section: 'Documents',
+    action: () => downloadDoc(doc),
+  }));
+
+  const allCommands = [...staticCommands, ...documentCommands];
+
+  const filteredCommands = allCommands.filter((cmd) =>
     cmd.name.toLowerCase().includes(query.toLowerCase())
   );
 
