@@ -10,14 +10,16 @@ import java.util.*;
 
 public interface DocumentRepository extends JpaRepository<Document, Long> {
 
-    List<Document> findByUser(User user);
+    List<Document> findByUserAndDeletedAtIsNull(User user);
     
-    Optional<Document> findByIdAndUser(Long id, User user);
+    Optional<Document> findByIdAndUserAndDeletedAtIsNull(Long id, User user);
     
-    List<Document> findByUserAndOriginalFileNameContainingIgnoreCase(User user, String keyword);
+    List<Document> findByUserAndOriginalFileNameContainingIgnoreCaseAndDeletedAtIsNull(User user, String keyword);
 
-    Optional<Document> findByShareToken(String shareToken);
+    Optional<Document> findByShareTokenAndDeletedAtIsNull(String shareToken);
 
-    List<Document> findByUser(User user, Sort sort);
+    List<Document> findByUserAndDeletedAtIsNull(User user, Sort sort);
+
+    List<Document> findByUserAndDeletedAtIsNotNull(User user, Sort sort);
 
 }

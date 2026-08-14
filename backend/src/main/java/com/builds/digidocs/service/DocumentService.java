@@ -24,4 +24,7 @@ public interface DocumentService {
     void revokeShare(Long id, String email);
     DocumentResponse toggleStar(Long id, String email);
     Resource downloadMultipleAsZip(List<Long> ids, String email);
+    List<DocumentResponse> getDeletedDocuments(String email, String sortParam);
+    DocumentResponse restoreDocument(Long id, String email);
+    void permanentlyDeleteDocument(Long id, String email);
 }
