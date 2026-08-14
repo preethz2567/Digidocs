@@ -199,4 +199,39 @@ public ResponseEntity<?> downloadMultipleAsZip(
     }
 }
 
+@GetMapping("/trash")
+public List<DocumentResponse> getDeletedDocuments(
+        @RequestParam(defaultValue = "date") String sort,
+        @RequestHeader("Authorization") String authHeader) {
+
+    String token = authHeader.substring(7);
+    String email = jwtService.extractEmail(token);
+
+    return documentService.getDeletedDocuments(email, sort);
+}
+
+@PutMapping("/{id}/restore")
+public DocumentResponse restoreDocument(
+        @PathVariable Long id,
+        @RequestHeader("Authorization") String authHeader) {
+
+    String token = authHeader.substring(7);
+    String email = jwtService.extractEmail(token);
+
+    return documentService.restoreDocument(id, email);
+}
+
+@DeleteMapping("/{id}/permanent")
+public ResponseEntity<String> permanentlyDeleteDocument(
+        @PathVariable Long id,
+        @RequestHeader("Authorization") String authHeader) {
+
+    String token = authHeader.substring(7);
+    String email = jwtService.extractEmail(token);
+
+    documentService.permanentlyDeleteDocument(id, email);
+
+    return ResponseEntity.ok("Document permanently deleted");
+}
+
 }

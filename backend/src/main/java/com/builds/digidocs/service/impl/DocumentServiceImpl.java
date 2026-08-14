@@ -191,31 +191,16 @@ public DocumentDownloadResponse downloadDocument(Long id, String email) {
 }
 
 @Override
-public void deleteDocument(Long id, String email) {
-
-    try {
-
+    public void deleteDocument(Long id, String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        Document document = documentRepository
-                .findByIdAndUser(id, user)
-                .orElseThrow(() -> new DocumentNotFoundException("Document not found"));
+        Document document = documentRepository.findByIdAndUserAndDeletedAtIsNull(id, user)
+                .orElseThrow(() -> new DocumentNotFoundException("Document not found or already deleted"));
 
-        Path path = Paths.get(document.getFilePath());
-
-        Files.deleteIfExists(path);
-        logger.info("Document deleted: {} by {}",
-        document.getOriginalFileName(),
-        email);
-
-        documentRepository.delete(document);
-
-    } catch (IOException e) {
-        logger.error("Failed to delete document", e);
-        throw new RuntimeException("Failed to delete document");
+        document.setDeletedAt(LocalDateTime.now());
+        documentRepository.save(document);
     }
-}
 
 @Override
 public List<DocumentResponse> searchDocuments(String email, String keyword) {
@@ -224,7 +209,7 @@ public List<DocumentResponse> searchDocuments(String email, String keyword) {
             .orElseThrow(() -> new UserNotFoundException("User not found"));
 
     return documentRepository
-            .findByUserAndOriginalFileNameContainingIgnoreCase(user, keyword)
+            .findByUserAndOriginalFileNameContainingIgnoreCaseAndDeletedAtIsNull(user, keyword)
             .stream()
             .map(document -> new DocumentResponse(
                     document.getId(),
@@ -243,12 +228,8 @@ public DocumentResponse renameDocument(Long id, String email, String newName) {
     User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-    Document document = documentRepository.findById(id)
+    Document document = documentRepository.findByIdAndUserAndDeletedAtIsNull(id, user)
             .orElseThrow(() -> new DocumentNotFoundException("Document not found"));
-
-    if (!document.getUser().getId().equals(user.getId())) {
-        throw new UnauthorizedException("Access denied");
-    }
 
     document.setOriginalFileName(newName);
 
@@ -273,12 +254,8 @@ public DocumentResponse getDocument(Long id, String email) {
     User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-    Document document = documentRepository.findById(id)
+    Document document = documentRepository.findByIdAndUserAndDeletedAtIsNull(id, user)
             .orElseThrow(() -> new DocumentNotFoundException("Document not found"));
-
-    if (!document.getUser().getId().equals(user.getId())) {
-        throw new UnauthorizedException("Access denied");
-    }
 
     logger.info("Metadata viewed for document {} by {}",
         document.getId(),
@@ -300,12 +277,8 @@ public ShareResponse shareDocument(Long id, String email) {
     User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-    Document document = documentRepository.findById(id)
+    Document document = documentRepository.findByIdAndUserAndDeletedAtIsNull(id, user)
             .orElseThrow(() -> new DocumentNotFoundException("Document not found"));
-
-    if (!document.getUser().getId().equals(user.getId())) {
-        throw new UnauthorizedException("Access denied");
-    }
 
     if (document.getShareToken() == null ||
         document.getShareExpiry() == null ||
@@ -326,7 +299,7 @@ public ShareResponse shareDocument(Long id, String email) {
 @Override
 public DocumentDownloadResponse downloadSharedDocument(String shareToken) {
 
-    Document document = documentRepository.findByShareToken(shareToken)
+    Document document = documentRepository.findByShareTokenAndDeletedAtIsNull(shareToken)
             .orElseThrow(() -> new DocumentNotFoundException("Shared document not found"));
 
     if (document.getShareExpiry() == null ||
@@ -357,12 +330,8 @@ public void revokeShare(Long id, String email) {
     User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
 
-    Document document = documentRepository.findById(id)
+    Document document = documentRepository.findByIdAndUserAndDeletedAtIsNull(id, user)
             .orElseThrow(() -> new RuntimeException("Document not found"));
-
-    if (!document.getUser().getId().equals(user.getId())) {
-        throw new RuntimeException("Access denied");
-    }
 
     document.setShareToken(null);
     document.setShareExpiry(null);
@@ -380,12 +349,8 @@ public DocumentResponse toggleStar(Long id, String email) {
     User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-    Document document = documentRepository.findById(id)
+    Document document = documentRepository.findByIdAndUserAndDeletedAtIsNull(id, user)
             .orElseThrow(() -> new DocumentNotFoundException("Document not found"));
-
-    if (!document.getUser().getId().equals(user.getId())) {
-        throw new UnauthorizedException("Access denied");
-    }
 
     document.setStarred(!document.isStarred());
     Document saved = documentRepository.save(document);
@@ -410,9 +375,8 @@ public Resource downloadMultipleAsZip(List<Long> ids, String email) {
 
     List<Document> documents = documentRepository.findAllById(ids);
     
-    // Verify ownership
     for (Document doc : documents) {
-        if (!doc.getUser().getId().equals(user.getId())) {
+        if (!doc.getUser().getId().equals(user.getId()) || doc.getDeletedAt() != null) {
             throw new UnauthorizedException("Access denied for document: " + doc.getOriginalFileName());
         }
     }
@@ -446,4 +410,64 @@ public Resource downloadMultipleAsZip(List<Long> ids, String email) {
         throw new RuntimeException("Failed to create zip file");
     }
 }
+
+@Override
+public List<DocumentResponse> getDeletedDocuments(String email, String sortParam) {
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+    Sort sort = Sort.by(Sort.Direction.DESC, "deletedAt");
+    List<Document> documents = documentRepository.findByUserAndDeletedAtIsNotNull(user, sort);
+
+    return documents.stream()
+            .map(doc -> new DocumentResponse(
+                    doc.getId(),
+                    doc.getOriginalFileName(),
+                    doc.getFileSize(),
+                    doc.getContentType(),
+                    doc.getUploadedAt(),
+                    doc.isStarred()
+            ))
+            .toList();
+}
+
+@Override
+public DocumentResponse restoreDocument(Long id, String email) {
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+    Document document = documentRepository.findByIdAndUserAndDeletedAtIsNotNull(id, user)
+            .orElseThrow(() -> new DocumentNotFoundException("Document not found in trash"));
+
+    document.setDeletedAt(null);
+    Document saved = documentRepository.save(document);
+
+    return new DocumentResponse(
+            saved.getId(),
+            saved.getOriginalFileName(),
+            saved.getFileSize(),
+            saved.getContentType(),
+            saved.getUploadedAt(),
+            saved.isStarred()
+    );
+}
+
+@Override
+public void permanentlyDeleteDocument(Long id, String email) {
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+    Document document = documentRepository.findByIdAndUserAndDeletedAtIsNotNull(id, user)
+            .orElseThrow(() -> new DocumentNotFoundException("Document not found in trash"));
+
+    try {
+        Path path = Paths.get(document.getFilePath());
+        Files.deleteIfExists(path);
+    } catch (IOException e) {
+        logger.error("Failed to delete file from filesystem", e);
+    }
+
+    documentRepository.delete(document);
+}
+
 }

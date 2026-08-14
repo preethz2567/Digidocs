@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, FileText, User, LogOut, Package2 } from 'lucide-react';
+import { Home, FileText, User, LogOut, Package2, Trash2 } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
 import './Sidebar.css';
 
@@ -40,6 +40,7 @@ export const Sidebar: React.FC = () => {
         <div className="sidebar__section-label">Workspace</div>
         <NavItem to="/dashboard" label="Dashboard" icon={<Home size={16} strokeWidth={2} />} end />
         <NavItem to="/documents" label="Documents" icon={<FileText size={16} strokeWidth={2} />} />
+        <NavItem to="/trash" label="Trash" icon={<Trash2 size={16} strokeWidth={2} />} />
 
         <div className="sidebar__section-label" style={{ marginTop: 12 }}>Account</div>
         <NavItem to="/profile" label="Profile" icon={<User size={16} strokeWidth={2} />} />

@@ -43,6 +43,17 @@ public class Document {
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean isStarred;
 
+    @Column
+    private LocalDateTime deletedAt;
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
     public boolean isStarred() {
         return isStarred;
     }

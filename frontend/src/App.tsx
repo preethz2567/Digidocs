@@ -11,6 +11,7 @@ import ChangePassword from "./pages/ChangePassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import Documents from "./pages/Documents";
+import Trash from "./pages/Trash";
 import NotFound from "./pages/NotFound";
 import { MainLayout } from "./layouts/MainLayout";
 import SharedDocument from "./pages/SharedDocument";
@@ -44,6 +45,17 @@ function App() {
               <ProtectedRoute>
                 <MainLayout>
                   <Documents />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/trash"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Trash />
                 </MainLayout>
               </ProtectedRoute>
             }

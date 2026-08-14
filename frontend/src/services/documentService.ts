@@ -84,6 +84,21 @@ const downloadMultipleAsZip = async (ids: number[]) => {
   return response.data;
 };
 
+const getDeletedDocuments = async (sort = "date") => {
+  const response = await api.get(`/documents/trash?sort=${sort}`);
+  return response.data;
+};
+
+const restoreDocument = async (id: number) => {
+  const response = await api.put(`/documents/${id}/restore`);
+  return response.data;
+};
+
+const permanentlyDeleteDocument = async (id: number) => {
+  const response = await api.delete(`/documents/${id}/permanent`);
+  return response.data;
+};
+
 const documentService = {
   getDocuments,
   uploadDocument,
@@ -96,6 +111,9 @@ const documentService = {
   revokeShare,
   toggleStar,
   downloadMultipleAsZip,
+  getDeletedDocuments,
+  restoreDocument,
+  permanentlyDeleteDocument,
 };
 
 /**
