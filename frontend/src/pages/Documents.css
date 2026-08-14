@@ -12,10 +12,11 @@
 }
 
 .documents-page__title {
-  font-size: 22px;
-  font-weight: 600;
-  color: #111827;
-  letter-spacing: -0.02em;
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
   margin-bottom: 2px;
 }
 
@@ -48,14 +49,14 @@
 
 .toolbar__search input {
   width: 100%;
-  height: 34px;
+  height: 36px;
   padding: 0 12px 0 32px;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  font-size: 13px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 0;
+  font-size: 14px;
   font-family: inherit;
-  color: #111827;
-  background: #ffffff;
+  color: var(--text-primary);
+  background: var(--input-bg);
   outline: none;
   transition: all 150ms ease;
 }
@@ -65,8 +66,7 @@
 }
 
 .toolbar__search input:focus {
-  border-color: #111827;
-  box-shadow: 0 0 0 2px rgba(17,24,39,0.06);
+  border-color: var(--border-focus);
 }
 
 .toolbar__filters {
@@ -76,15 +76,15 @@
 }
 
 .toolbar__select {
-  height: 34px;
+  height: 36px;
   padding: 0 28px 0 10px;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 0;
   font-size: 13px;
   font-weight: 500;
-  color: #374151;
+  color: var(--text-secondary);
   font-family: inherit;
-  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 8px center / 14px 14px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23484848' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 8px center / 14px 14px;
   appearance: none;
   outline: none;
   cursor: pointer;
@@ -96,7 +96,7 @@
 }
 
 .toolbar__select:focus {
-  border-color: #111827;
+  border-color: var(--border-focus);
 }
 
 /* Compact upload button */
@@ -104,23 +104,24 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 34px;
+  height: 36px;
   padding: 0 14px;
-  background: #111827;
+  background: var(--btn-primary-bg);
   color: #ffffff;
   border: none;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 500;
+  border-radius: 0;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  font-family: inherit;
+  font-family: var(--font-heading);
+  letter-spacing: 0.04em;
   transition: background 150ms ease;
   white-space: nowrap;
   flex-shrink: 0;
 }
 
 .btn-upload-sm:hover {
-  background: #2f2f2f;
+  background: var(--btn-primary-hover);
 }
 
 .btn-upload-sm svg {
@@ -134,38 +135,39 @@
 
 /* Table wrapper */
 .documents-page__table-wrapper {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 0;
   overflow: visible;
 }
 
 /* Shared modal button styles */
 .btn-secondary-sm {
-  height: 34px;
+  height: 36px;
   padding: 0 14px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
+  background: transparent;
+  border: 1px solid var(--text-secondary);
+  border-radius: 0;
   font-size: 13px;
   font-weight: 500;
-  color: #374151;
+  color: var(--text-tertiary);
   cursor: pointer;
   font-family: inherit;
   transition: all 150ms ease;
 }
 
 .btn-secondary-sm:hover {
-  background: #f9fafb;
+  border-color: var(--text-tertiary);
+  color: var(--text-primary);
 }
 
 .btn-danger-sm {
-  height: 34px;
+  height: 36px;
   padding: 0 14px;
-  background: #dc2626;
+  background: var(--error-color);
   color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 0;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -203,9 +205,10 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  background-color: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--border-focus);
+  border-radius: 0;
   margin-bottom: -10px;
 }
 

@@ -35,19 +35,21 @@
 .sidebar__brand-logo {
   width: 22px;
   height: 22px;
-  background-color: #111827;
-  border-radius: 4px;
+  background-color: var(--blue-500, #1d6ef7); /* Blue square */
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  color: #fff;
 }
 
 .sidebar__brand-name {
-  font-weight: 600;
-  font-size: 14px;
-  letter-spacing: -0.01em;
-  color: #111827;
+  font-weight: 700;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
 }
 
 .sidebar__nav {
@@ -72,13 +74,13 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  padding: 7px 10px;
-  color: #6b7280;
+  padding: 8px 10px;
+  color: var(--text-secondary);
   text-decoration: none;
   font-size: 13px;
   font-weight: 500;
-  border-radius: 6px;
-  transition: background-color 120ms ease, color 120ms ease;
+  border-radius: 0;
+  transition: background-color 150ms ease, color 150ms ease;
   position: relative;
   border: none;
   background: transparent;
@@ -89,19 +91,19 @@
 }
 
 .sidebar__link:hover {
-  background-color: #f3f4f6;
-  color: #111827;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
 }
 
 .sidebar__link:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px #111827;
+  box-shadow: 0 0 0 2px var(--border-focus);
 }
 
 /* Active: left border accent */
 .sidebar__link.active {
   background-color: #f0f0f0;
-  color: #111827;
+  color: var(--text-primary);
   font-weight: 600;
 }
 
@@ -109,11 +111,10 @@
   content: '';
   position: absolute;
   left: 0;
-  top: 6px;
-  bottom: 6px;
+  top: 0;
+  bottom: 0;
   width: 3px;
-  background-color: #111827;
-  border-radius: 0 2px 2px 0;
+  background-color: var(--blue-500, #1d6ef7);
 }
 
 .sidebar__icon {

@@ -39,11 +39,11 @@
 }
 
 .doc-table th:first-child {
-  border-top-left-radius: 5px;
+  border-top-left-radius: 0;
 }
 
 .doc-table th:last-child {
-  border-top-right-radius: 5px;
+  border-top-right-radius: 0;
 }
 
 .doc-table td {
@@ -58,15 +58,15 @@
 }
 
 .doc-table tbody tr {
-  transition: background-color 100ms ease;
+  transition: background-color 150ms ease;
 }
 
 .doc-table tbody tr:hover {
-  background-color: #f9fafb;
+  background-color: var(--bg-color);
 }
 
 .doc-table tbody tr:hover td {
-  color: #374151;
+  color: var(--text-primary);
 }
 
 .doc-table tbody tr.selected {
@@ -74,7 +74,7 @@
 }
 
 .doc-table tbody tr.selected td {
-  color: #374151;
+  color: var(--text-primary);
 }
 
 /* Column widths */
@@ -86,9 +86,9 @@
 .doc-table__col-checkbox input[type="checkbox"] {
   width: 14px;
   height: 14px;
-  accent-color: #111827;
+  accent-color: var(--text-primary);
   cursor: pointer;
-  border-radius: 3px;
+  border-radius: 0;
 }
 
 .doc-table__col-file {
@@ -112,28 +112,28 @@
 .doc-table__file-icon {
   width: 28px;
   height: 28px;
-  border-radius: 5px;
-  background-color: #f9fafb;
-  border: 1px solid #e5e7eb;
+  border-radius: 0;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #9ca3af;
+  color: var(--text-tertiary);
   flex-shrink: 0;
 }
 
 .doc-table__filename {
-  font-weight: 500;
-  color: #111827;
+  font-weight: 600;
+  color: var(--text-primary);
   cursor: pointer;
-  transition: color 120ms ease;
+  transition: color 150ms ease;
   font-size: 13px;
 }
 
 .doc-table__filename:hover {
-  color: #374151;
+  color: var(--link-color);
   text-decoration: underline;
-  text-decoration-color: #9ca3af;
+  text-decoration-color: var(--link-color);
 }
 
 .doc-table__col-actions {

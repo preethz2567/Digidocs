@@ -4,8 +4,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(2px);
+  background-color: rgba(0, 0, 0, 0.5); /* No glass/backdrop-filter per Deskline */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -33,9 +32,11 @@
 }
 
 .modal-title {
-  font-size: 16px;
-  font-weight: 600;
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
   color: var(--text-primary);
+  letter-spacing: -0.02em;
   margin-bottom: 4px;
 }
 
