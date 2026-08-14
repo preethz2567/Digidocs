@@ -1,7 +1,8 @@
 import React from 'react';
 import { FileText, MoreHorizontal } from 'lucide-react';
+import { DocumentGridItem } from './DocumentGridItem';
+import { type DocumentData } from './DocumentTable';
 import { ActionMenu } from './ActionMenu';
-import { DocumentData } from './DocumentTable';
 import './DocumentGrid.css';
 
 interface DocumentGridProps {

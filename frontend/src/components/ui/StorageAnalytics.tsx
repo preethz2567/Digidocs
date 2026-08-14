@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { DocumentData } from './DocumentTable';
+import { type DocumentData } from './DocumentTable';
 import './StorageAnalytics.css';
 
 interface StorageAnalyticsProps {

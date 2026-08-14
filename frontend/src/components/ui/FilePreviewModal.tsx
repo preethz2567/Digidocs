@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Download, Share2, X, FileText, Image as ImageIcon } from 'lucide-react';
-import { DocumentData } from './DocumentTable';
+import { type DocumentData } from './DocumentTable';
 import { Button } from './Button';
 import './FilePreviewModal.css';
 
