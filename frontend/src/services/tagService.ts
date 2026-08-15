@@ -1,5 +1,5 @@
 import api from "../api/axios";
-import { TagData } from "../components/ui/DocumentTable";
+import type { TagData } from "../components/ui/DocumentTable";
 
 const getAllTags = async () => {
   const response = await api.get('/tags');

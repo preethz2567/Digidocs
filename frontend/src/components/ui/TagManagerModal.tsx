@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Tag as TagIcon, Trash2 } from 'lucide-react';
-import { TagData, DocumentData } from './DocumentTable';
+import type { TagData, DocumentData } from './DocumentTable';
 import tagService from '../../services/tagService';
 
 interface TagManagerModalProps {
