@@ -3,6 +3,12 @@ import { FileText, MoreHorizontal } from 'lucide-react';
 import { ActionMenu } from './ActionMenu';
 import './DocumentTable.css';
 
+export interface TagData {
+  id: number;
+  name: string;
+  color: string;
+}
+
 export interface DocumentData {
   id: number;
   originalFileName: string;
@@ -11,6 +17,7 @@ export interface DocumentData {
   contentType: string;
   uploadedAt: string;
   isStarred?: boolean;
+  tags?: TagData[];
 }
 
 interface DocumentTableProps {
@@ -26,6 +33,7 @@ interface DocumentTableProps {
   onPreview?: (doc: DocumentData) => void;
   onToggleStar?: (doc: DocumentData) => void;
   onContextMenu?: (e: React.MouseEvent, doc: DocumentData) => void;
+  onManageTags?: (doc: DocumentData) => void;
 }
 
 const formatDate = (dateStr: string | undefined) => {
@@ -61,7 +69,8 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({
   onDownload,
   onPreview,
   onToggleStar,
-  onContextMenu
+  onContextMenu,
+  onManageTags
 }) => {
   const allSelected = documents.length > 0 && selectedIds.length === documents.length;
 
@@ -83,6 +92,7 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({
             <th style={{ width: '40px' }}></th>
             <th>Size</th>
             <th>Uploaded</th>
+            <th>Tags</th>
             <th className="doc-table__col-actions"></th>
           </tr>
         </thead>
@@ -139,6 +149,25 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({
                 </td>
                 <td>{formatSize(doc.fileSize)}</td>
                 <td>{formatDate(doc.uploadedAt)}</td>
+                <td>
+                  <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                    {doc.tags?.map(tag => (
+                      <span 
+                        key={tag.id} 
+                        style={{ 
+                          fontSize: '12px', 
+                          padding: '2px 6px', 
+                          border: `1px solid ${tag.color}`,
+                          color: tag.color,
+                          backgroundColor: `${tag.color}15`, // slightly transparent background
+                          fontWeight: 500 
+                        }}
+                      >
+                        {tag.name}
+                      </span>
+                    ))}
+                  </div>
+                </td>
                 <td className="doc-table__col-actions">
                     <ActionMenu
                       trigger={<MoreHorizontal size={16} strokeWidth={2} />}
@@ -146,6 +175,7 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({
                         { label: 'Preview', onClick: () => onPreview?.(doc) },
                         { label: 'Download', onClick: () => onDownload?.(doc) },
                         { label: 'Share', onClick: () => onShare?.(doc) },
+                        { label: 'Manage Tags', onClick: () => onManageTags?.(doc) },
                         { label: 'Rename', onClick: () => onRename?.(doc) },
                         { label: 'Delete', onClick: () => onDelete?.(doc), danger: true },
                       ]}

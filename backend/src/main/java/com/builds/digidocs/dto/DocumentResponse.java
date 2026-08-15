@@ -2,6 +2,7 @@ package com.builds.digidocs.dto;
 
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class DocumentResponse {
 
@@ -17,13 +18,16 @@ public class DocumentResponse {
 
     private boolean isStarred;
 
-    public DocumentResponse(Long id, String originalFileName, Long fileSize, String contentType, LocalDateTime uploadedAt, boolean isStarred) {
+    private List<TagDto> tags;
+
+    public DocumentResponse(Long id, String originalFileName, Long fileSize, String contentType, LocalDateTime uploadedAt, boolean isStarred, List<TagDto> tags) {
         this.id = id;
         this.originalFileName = originalFileName;
         this.fileSize = fileSize;
         this.contentType = contentType;
         this.uploadedAt = uploadedAt;
         this.isStarred = isStarred;
+        this.tags = tags;
     }
 
     public Long getId() {
@@ -72,5 +76,13 @@ public class DocumentResponse {
 
     public void setStarred(boolean starred) {
         isStarred = starred;
+    }
+
+    public List<TagDto> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<TagDto> tags) {
+        this.tags = tags;
     }
 }

@@ -4,6 +4,7 @@ import com.builds.digidocs.dto.DocumentResponse;
 import com.builds.digidocs.dto.RenameDocumentRequest;
 import com.builds.digidocs.security.JwtService;
 import com.builds.digidocs.service.DocumentService;
+import com.builds.digidocs.service.TagService;
 
 import jakarta.validation.Valid;
 
@@ -22,11 +23,14 @@ public class DocumentController {
 
     private final DocumentService documentService;
     private final JwtService jwtService;
+    private final TagService tagService;
 
     public DocumentController(DocumentService documentService,
-                              JwtService jwtService) {
+                              JwtService jwtService,
+                              TagService tagService) {
         this.documentService = documentService;
         this.jwtService = jwtService;
+        this.tagService = tagService;
     }
 
     @GetMapping
@@ -232,6 +236,28 @@ public ResponseEntity<String> permanentlyDeleteDocument(
     documentService.permanentlyDeleteDocument(id, email);
 
     return ResponseEntity.ok("Document permanently deleted");
+}
+
+@PostMapping("/{id}/tags/{tagId}")
+public ResponseEntity<Void> assignTag(
+        @PathVariable Long id,
+        @PathVariable Long tagId,
+        @RequestHeader("Authorization") String authHeader) {
+    String token = authHeader.substring(7);
+    String email = jwtService.extractEmail(token);
+    tagService.assignTagToDocument(id, tagId, email);
+    return ResponseEntity.ok().build();
+}
+
+@DeleteMapping("/{id}/tags/{tagId}")
+public ResponseEntity<Void> removeTag(
+        @PathVariable Long id,
+        @PathVariable Long tagId,
+        @RequestHeader("Authorization") String authHeader) {
+    String token = authHeader.substring(7);
+    String email = jwtService.extractEmail(token);
+    tagService.removeTagFromDocument(id, tagId, email);
+    return ResponseEntity.noContent().build();
 }
 
 }

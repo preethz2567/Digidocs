@@ -24,6 +24,10 @@ import com.builds.digidocs.dto.DocumentResponse;
 import com.builds.digidocs.dto.ShareResponse;
 import com.builds.digidocs.entity.Document;
 import com.builds.digidocs.entity.User;
+import com.builds.digidocs.mapper.TagMapper;
+import java.util.stream.Collectors;
+import com.builds.digidocs.entity.Document;
+import com.builds.digidocs.entity.User;
 import org.springframework.data.domain.Sort;
 import com.builds.digidocs.exception.DocumentNotFoundException;
 import com.builds.digidocs.exception.UnauthorizedException;
@@ -42,11 +46,26 @@ public class DocumentServiceImpl implements DocumentService {
 
     private final DocumentRepository documentRepository;
     private final UserRepository userRepository;
+    private final TagMapper tagMapper;
 
     public DocumentServiceImpl(DocumentRepository documentRepository,
-                               UserRepository userRepository) {
+                               UserRepository userRepository,
+                               TagMapper tagMapper) {
         this.documentRepository = documentRepository;
         this.userRepository = userRepository;
+        this.tagMapper = tagMapper;
+    }
+
+    private DocumentResponse mapToDocumentResponse(Document doc) {
+        return new DocumentResponse(
+                doc.getId(),
+                doc.getOriginalFileName(),
+                doc.getFileSize(),
+                doc.getContentType(),
+                doc.getUploadedAt(),
+                doc.isStarred(),
+                doc.getTags() != null ? doc.getTags().stream().map(tagMapper::toDto).collect(Collectors.toList()) : null
+        );
     }
 
     @Value("${file.upload-dir}")
@@ -105,14 +124,7 @@ if (!allowedTypes.contains(file.getContentType())) {
             saved.getOriginalFileName(),
             email);
 
-            return new DocumentResponse(
-                    saved.getId(),
-                    saved.getOriginalFileName(),
-                    saved.getFileSize(),
-                    saved.getContentType(),
-                    saved.getUploadedAt(),
-                    saved.isStarred()
-            );
+            return mapToDocumentResponse(saved);
 
         } catch (IOException e) {
             logger.error("File upload failed", e);
@@ -145,14 +157,7 @@ public List<DocumentResponse> getDocuments(String email, String sort) {
 
     return documentRepository.findByUserAndDeletedAtIsNull(user, sorting)
             .stream()
-            .map(document -> new DocumentResponse(
-                    document.getId(),
-                    document.getOriginalFileName(),
-                    document.getFileSize(),
-                    document.getContentType(),
-                    document.getUploadedAt(),
-                    document.isStarred()
-            ))
+            .map(this::mapToDocumentResponse)
             .toList();
 }
 
@@ -211,14 +216,7 @@ public List<DocumentResponse> searchDocuments(String email, String keyword) {
     return documentRepository
             .findByUserAndOriginalFileNameContainingIgnoreCaseAndDeletedAtIsNull(user, keyword)
             .stream()
-            .map(document -> new DocumentResponse(
-                    document.getId(),
-                    document.getOriginalFileName(),
-                    document.getFileSize(),
-                    document.getContentType(),
-                    document.getUploadedAt(),
-                    document.isStarred()
-            ))
+            .map(this::mapToDocumentResponse)
             .toList();
 }
 
@@ -238,14 +236,7 @@ public DocumentResponse renameDocument(Long id, String email, String newName) {
         saved.getOriginalFileName(),
         email);
 
-    return new DocumentResponse(
-            saved.getId(),
-            saved.getOriginalFileName(),
-            saved.getFileSize(),
-            saved.getContentType(),
-            saved.getUploadedAt(),
-            saved.isStarred()
-    );
+    return mapToDocumentResponse(saved);
 }
 
 @Override
@@ -261,14 +252,7 @@ public DocumentResponse getDocument(Long id, String email) {
         document.getId(),
         email);
 
-    return new DocumentResponse(
-            document.getId(),
-            document.getOriginalFileName(),
-            document.getFileSize(),
-            document.getContentType(),
-            document.getUploadedAt(),
-            document.isStarred()
-    );
+    return mapToDocumentResponse(document);
 }
 
 @Override
@@ -358,14 +342,7 @@ public DocumentResponse toggleStar(Long id, String email) {
     logger.info("Document {} starred status toggled to {} by {}",
             saved.getId(), saved.isStarred(), email);
 
-    return new DocumentResponse(
-            saved.getId(),
-            saved.getOriginalFileName(),
-            saved.getFileSize(),
-            saved.getContentType(),
-            saved.getUploadedAt(),
-            saved.isStarred()
-    );
+    return mapToDocumentResponse(saved);
 }
 
 @Override
@@ -420,14 +397,7 @@ public List<DocumentResponse> getDeletedDocuments(String email, String sortParam
     List<Document> documents = documentRepository.findByUserAndDeletedAtIsNotNull(user, sort);
 
     return documents.stream()
-            .map(doc -> new DocumentResponse(
-                    doc.getId(),
-                    doc.getOriginalFileName(),
-                    doc.getFileSize(),
-                    doc.getContentType(),
-                    doc.getUploadedAt(),
-                    doc.isStarred()
-            ))
+            .map(this::mapToDocumentResponse)
             .toList();
 }
 
@@ -442,14 +412,7 @@ public DocumentResponse restoreDocument(Long id, String email) {
     document.setDeletedAt(null);
     Document saved = documentRepository.save(document);
 
-    return new DocumentResponse(
-            saved.getId(),
-            saved.getOriginalFileName(),
-            saved.getFileSize(),
-            saved.getContentType(),
-            saved.getUploadedAt(),
-            saved.isStarred()
-    );
+    return mapToDocumentResponse(saved);
 }
 
 @Override

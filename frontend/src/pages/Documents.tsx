@@ -11,6 +11,7 @@ import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { useToast } from '../components/ui/ToastContext';
 import { FilePreviewModal } from '../components/ui/FilePreviewModal';
+import { TagManagerModal } from '../components/ui/TagManagerModal';
 import { addRecentlyViewed } from '../services/recentlyViewedService';
 import { useUiStore } from '../store/uiStore';
 import './Documents.css';
@@ -37,6 +38,7 @@ const Documents: React.FC = () => {
   const [renameOpen, setRenameOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [tagManagerOpen, setTagManagerOpen] = useState(false);
   const [activeDoc, setActiveDoc] = useState<DocumentData | null>(null);
   const [newName, setNewName] = useState('');
   const [shareLink, setShareLink] = useState('');
@@ -462,6 +464,7 @@ const Documents: React.FC = () => {
               onPreview={handlePreview}
               onRename={doc => { setActiveDoc(doc); setNewName(doc.originalFileName); setRenameOpen(true); }}
               onDelete={doc => { setActiveDoc(doc); setDeleteOpen(true); }}
+              onManageTags={doc => { setActiveDoc(doc); setTagManagerOpen(true); }}
               onShare={handleShare}
               onToggleStar={handleToggleStar}
               onContextMenu={handleContextMenu}
@@ -476,6 +479,7 @@ const Documents: React.FC = () => {
               onPreview={handlePreview}
               onRename={doc => { setActiveDoc(doc); setNewName(doc.originalFileName); setRenameOpen(true); }}
               onDelete={doc => { setActiveDoc(doc); setDeleteOpen(true); }}
+              onManageTags={doc => { setActiveDoc(doc); setTagManagerOpen(true); }}
               onShare={handleShare}
               onToggleStar={handleToggleStar}
               onContextMenu={handleContextMenu}
@@ -568,6 +572,14 @@ const Documents: React.FC = () => {
         onShare={(doc) => { closePreview(); handleShare(doc); }}
       />
 
+      {tagManagerOpen && activeDoc && (
+        <TagManagerModal 
+          document={activeDoc} 
+          onClose={() => setTagManagerOpen(false)} 
+          onTagChange={fetchDocuments} 
+        />
+      )}
+
       {contextMenu.isOpen && contextMenu.doc && (
         <div
           style={{
@@ -602,6 +614,10 @@ const Documents: React.FC = () => {
             className="action-menu__item"
             onClick={() => { setContextMenu({ ...contextMenu, isOpen: false }); handleToggleStar(contextMenu.doc!); }}
           >{contextMenu.doc.isStarred ? 'Unstar' : 'Star'}</button>
+          <button 
+            className="action-menu__item"
+            onClick={() => { setContextMenu({ ...contextMenu, isOpen: false }); setActiveDoc(contextMenu.doc); setTagManagerOpen(true); }}
+          >Manage Tags</button>
           <div className="action-menu__divider"></div>
           <button 
             className="action-menu__item"

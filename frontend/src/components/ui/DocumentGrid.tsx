@@ -16,6 +16,7 @@ interface DocumentGridProps {
   onPreview?: (doc: DocumentData) => void;
   onToggleStar?: (doc: DocumentData) => void;
   onContextMenu?: (e: React.MouseEvent, doc: DocumentData) => void;
+  onManageTags?: (doc: DocumentData) => void;
 }
 
 const formatDate = (dateStr: string | undefined) => {
@@ -50,7 +51,8 @@ export const DocumentGrid: React.FC<DocumentGridProps> = ({
   onDownload,
   onPreview,
   onToggleStar,
-  onContextMenu
+  onContextMenu,
+  onManageTags
 }) => {
   return (
     <div className="document-grid">
@@ -122,6 +124,7 @@ export const DocumentGrid: React.FC<DocumentGridProps> = ({
                       { label: 'Preview', onClick: () => onPreview?.(doc) },
                       { label: 'Download', onClick: () => onDownload?.(doc) },
                       { label: 'Share', onClick: () => onShare?.(doc) },
+                      { label: 'Manage Tags', onClick: () => onManageTags?.(doc) },
                       { label: 'Rename', onClick: () => onRename?.(doc) },
                       { label: 'Delete', onClick: () => onDelete?.(doc), danger: true },
                     ]}
@@ -134,6 +137,26 @@ export const DocumentGrid: React.FC<DocumentGridProps> = ({
                 <span>•</span>
                 <span>{formatDate(doc.uploadedAt)}</span>
               </div>
+              
+              {doc.tags && doc.tags.length > 0 && (
+                <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '8px' }}>
+                  {doc.tags.map(tag => (
+                    <span 
+                      key={tag.id} 
+                      style={{ 
+                        fontSize: '11px', 
+                        padding: '2px 6px', 
+                        border: `1px solid ${tag.color}`,
+                        color: tag.color,
+                        backgroundColor: `${tag.color}15`,
+                        fontWeight: 500 
+                      }}
+                    >
+                      {tag.name}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         );

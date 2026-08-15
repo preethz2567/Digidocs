@@ -3,6 +3,8 @@ package com.builds.digidocs.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "documents")
@@ -45,6 +47,14 @@ public class Document {
 
     @Column
     private LocalDateTime deletedAt;
+
+    @ManyToMany
+    @JoinTable(
+        name = "document_tags",
+        joinColumns = @JoinColumn(name = "document_id"),
+        inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<Tag> tags = new HashSet<>();
 
     public LocalDateTime getDeletedAt() {
         return deletedAt;
@@ -140,5 +150,13 @@ public class Document {
 
     public void setShareToken(String shareToken) {
         this.shareToken = shareToken;
+    }
+
+    public Set<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<Tag> tags) {
+        this.tags = tags;
     }
 }
