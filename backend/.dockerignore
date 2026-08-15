@@ -1,0 +1,11 @@
+target
+!.mvn/wrapper/maven-wrapper.jar
+!target/*.jar
+*mvnw*
+.mvn
+.git
+.gitignore
+.dockerignore
+Dockerfile
+src/main/resources/application-prod.properties
+uploads
