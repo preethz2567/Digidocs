@@ -2,8 +2,6 @@ package com.builds.digidocs.controller;
 
 import com.builds.digidocs.dto.DocumentDownloadResponse;
 import com.builds.digidocs.service.DocumentService;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,18 +16,12 @@ public class ShareController {
     }
 
     @GetMapping("/{shareToken}")
-    public ResponseEntity<Resource> downloadSharedDocument(
+    public ResponseEntity<DocumentDownloadResponse> downloadSharedDocument(
             @PathVariable String shareToken) {
 
         DocumentDownloadResponse response =
                 documentService.downloadSharedDocument(shareToken);
 
-        return ResponseEntity.ok()
-                .header(
-                        HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" +
-                                response.getOriginalFileName() + "\""
-                )
-                .body(response.getResource());
+        return ResponseEntity.ok(response);
     }
 }
