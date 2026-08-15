@@ -16,10 +16,9 @@ const SharedDocument: React.FC = () => {
 
     const load = async () => {
       try {
-        const { blob, filename } = await getSharedDocument(token);
-        const url = URL.createObjectURL(blob);
+        const { url, originalFileName } = await getSharedDocument(token);
         setBlobUrl(url);
-        setFileName(filename);
+        setFileName(originalFileName);
         setState('ready');
       } catch (err: any) {
         const status = err?.response?.status;
@@ -29,7 +28,6 @@ const SharedDocument: React.FC = () => {
     };
 
     load();
-    return () => { if (blobUrl) URL.revokeObjectURL(blobUrl); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
@@ -37,8 +35,9 @@ const SharedDocument: React.FC = () => {
     if (!blobUrl) return;
     const a = document.createElement('a');
     a.href = blobUrl;
-    a.download = fileName || 'document';
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
   };
 
   return (
