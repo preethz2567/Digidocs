@@ -200,14 +200,12 @@ const Documents: React.FC = () => {
   const handleDownload = async (doc: DocumentData) => {
     try {
       addRecentlyViewed(doc.id);
-      const blob = await documentService.downloadDocument(doc.id);
-      const url = window.URL.createObjectURL(blob);
+      const { url } = await documentService.downloadDocument(doc.id);
       const a = document.createElement('a');
       a.href = url;
-      a.download = doc.originalFileName;
       document.body.appendChild(a);
       a.click();
-      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
     } catch {
       showToast('Download failed.', 'error');
     }
@@ -326,12 +324,11 @@ const Documents: React.FC = () => {
     setPreviewOwner('');
 
     try {
-      const [blob, metadata] = await Promise.all([
+      const [downloadData, metadata] = await Promise.all([
         documentService.downloadDocument(doc.id),
         documentService.getMetadata(doc.id).catch(() => ({ ownerName: 'Unknown' }))
       ]);
-      const url = window.URL.createObjectURL(blob);
-      setPreviewUrl(url);
+      setPreviewUrl(downloadData.url);
       
       const ownerName = metadata.ownerName || (metadata.user && (metadata.user.name || metadata.user.email)) || 'Unknown';
       setPreviewOwner(ownerName);
