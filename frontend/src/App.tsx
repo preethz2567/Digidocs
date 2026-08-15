@@ -15,13 +15,14 @@ import Trash from "./pages/Trash";
 import NotFound from "./pages/NotFound";
 import { MainLayout } from "./layouts/MainLayout";
 import SharedDocument from "./pages/SharedDocument";
+import Landing from "./pages/Landing";
 
 function App() {
   return (
     <ErrorBoundary>
       <ToastProvider>
         <Routes>
-          <Route path="/" element={<Login />} />
+          <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
