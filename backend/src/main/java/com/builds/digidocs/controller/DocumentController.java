@@ -5,6 +5,8 @@ import com.builds.digidocs.dto.RenameDocumentRequest;
 import com.builds.digidocs.security.JwtService;
 import com.builds.digidocs.service.DocumentService;
 import com.builds.digidocs.service.TagService;
+import com.builds.digidocs.service.StorageService;
+import com.builds.digidocs.service.impl.FileSystemStorageServiceImpl;
 
 import jakarta.validation.Valid;
 
@@ -24,13 +26,16 @@ public class DocumentController {
     private final DocumentService documentService;
     private final JwtService jwtService;
     private final TagService tagService;
+    private final StorageService storageService;
 
     public DocumentController(DocumentService documentService,
                               JwtService jwtService,
-                              TagService tagService) {
+                              TagService tagService,
+                              StorageService storageService) {
         this.documentService = documentService;
         this.jwtService = jwtService;
         this.tagService = tagService;
+        this.storageService = storageService;
     }
 
     @GetMapping
@@ -38,11 +43,11 @@ public class DocumentController {
         @RequestParam(defaultValue = "date") String sort,
         @RequestHeader("Authorization") String authHeader) {
 
-    String token = authHeader.substring(7);
-    String email = jwtService.extractEmail(token);
+        String token = authHeader.substring(7);
+        String email = jwtService.extractEmail(token);
 
-    return documentService.getDocuments(email, sort);
-}
+        return documentService.getDocuments(email, sort);
+    }
 
     @PostMapping("/upload")
     public DocumentResponse uploadDocument(
@@ -56,208 +61,184 @@ public class DocumentController {
     }
 
     @GetMapping("/{id}")
-public ResponseEntity<Resource> downloadDocument(
-        @PathVariable Long id,
-        @RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<DocumentDownloadResponse> downloadDocument(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String authHeader) {
 
-    String token = authHeader.substring(7);
+        String token = authHeader.substring(7);
+        String email = jwtService.extractEmail(token);
 
-    String email = jwtService.extractEmail(token);
+        DocumentDownloadResponse response =
+                documentService.downloadDocument(id, email);
 
-    DocumentDownloadResponse response =
-            documentService.downloadDocument(id, email);
-
-    return ResponseEntity.ok()
-            .header(
-                    HttpHeaders.CONTENT_DISPOSITION,
-                    "attachment; filename=\"" +
-                            response.getOriginalFileName() + "\""
-            )
-            .body(response.getResource());
-}
-
-@DeleteMapping("/{id}")
-public ResponseEntity<String> deleteDocument(
-        @PathVariable Long id,
-        @RequestHeader("Authorization") String authHeader) {
-
-    String token = authHeader.substring(7);
-
-    String email = jwtService.extractEmail(token);
-
-    documentService.deleteDocument(id, email);
-
-    return ResponseEntity.ok("Document deleted successfully");
-}
-
-
-@GetMapping("/search")
-public List<DocumentResponse> searchDocuments(
-        @RequestParam String keyword,
-        @RequestHeader("Authorization") String authHeader) {
-
-    String token = authHeader.substring(7);
-
-    String email = jwtService.extractEmail(token);
-
-    return documentService.searchDocuments(email, keyword);
-}
-
-@PutMapping("/{id}")
-public DocumentResponse renameDocument(
-        @PathVariable Long id,
-        @Valid @RequestBody RenameDocumentRequest request,
-        @RequestHeader("Authorization") String authHeader){
-
-    String token = authHeader.substring(7);
-
-    String email = jwtService.extractEmail(token);
-
-    return documentService.renameDocument(
-            id,
-            email,
-            request.getNewName()
-    );
-}
-
-@GetMapping("/{id}/metadata")
-public DocumentResponse getDocument(
-        @PathVariable Long id,
-        @RequestHeader("Authorization") String authHeader) {
-
-    String token = authHeader.substring(7);
-    String email = jwtService.extractEmail(token);
-
-    return documentService.getDocument(id, email);
-}
-
-@PostMapping("/{id}/share")
-public ShareResponse shareDocument(
-        @PathVariable Long id,
-        @RequestHeader("Authorization") String authHeader) {
-
-    String token = authHeader.substring(7);
-
-    String email = jwtService.extractEmail(token);
-
-    return documentService.shareDocument(id, email);
-}
-
-@DeleteMapping("/{id}/share")
-public ResponseEntity<String> revokeShare(
-        @PathVariable Long id,
-        @RequestHeader("Authorization") String authHeader) {
-
-    String token = authHeader.substring(7);
-    String email = jwtService.extractEmail(token);
-
-    documentService.revokeShare(id, email);
-
-    return ResponseEntity.ok("Share link revoked successfully");
-}
-
-@GetMapping("/share/{shareToken}")
-public ResponseEntity<?> downloadSharedDocumentPublic(@PathVariable String shareToken) {
-    try {
-        DocumentDownloadResponse response = documentService.downloadSharedDocument(shareToken);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" + response.getOriginalFileName() + "\"")
-                .header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION)
-                .body(response.getResource());
-    } catch (com.builds.digidocs.exception.DocumentNotFoundException e) {
-        return ResponseEntity.status(404).body("Invalid or expired share token");
-    } catch (Exception e) {
-        return ResponseEntity.status(500).body("Failed to retrieve shared document");
+        return ResponseEntity.ok(response);
     }
-}
 
-@PutMapping("/{id}/star")
-public DocumentResponse toggleStar(
-        @PathVariable Long id,
-        @RequestHeader("Authorization") String authHeader) {
-
-    String token = authHeader.substring(7);
-    String email = jwtService.extractEmail(token);
-
-    return documentService.toggleStar(id, email);
-}
-
-@GetMapping("/download-zip")
-public ResponseEntity<?> downloadMultipleAsZip(
-        @RequestParam List<Long> ids,
-        @RequestHeader("Authorization") String authHeader) {
-
-    String token = authHeader.substring(7);
-    String email = jwtService.extractEmail(token);
-
-    try {
-        Resource resource = documentService.downloadMultipleAsZip(ids, email);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"documents.zip\"")
-                .header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION)
-                .contentType(org.springframework.http.MediaType.parseMediaType("application/zip"))
+    @GetMapping("/local-download")
+    public ResponseEntity<Resource> localDownload(@RequestParam String token) {
+        if (storageService instanceof FileSystemStorageServiceImpl) {
+            FileSystemStorageServiceImpl fs = (FileSystemStorageServiceImpl) storageService;
+            Resource resource = fs.resolveLocalDownload(token);
+            String originalFileName = fs.resolveOriginalFileName(token);
+            
+            return ResponseEntity.ok()
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + originalFileName + "\""
+                )
                 .body(resource);
-    } catch (Exception e) {
-        return ResponseEntity.status(500).body("Failed to create zip file");
+        }
+        return ResponseEntity.notFound().build();
     }
-}
 
-@GetMapping("/trash")
-public List<DocumentResponse> getDeletedDocuments(
-        @RequestParam(defaultValue = "date") String sort,
-        @RequestHeader("Authorization") String authHeader) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteDocument(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String authHeader) {
 
-    String token = authHeader.substring(7);
-    String email = jwtService.extractEmail(token);
+        String token = authHeader.substring(7);
+        String email = jwtService.extractEmail(token);
+        documentService.deleteDocument(id, email);
+        return ResponseEntity.ok("Document deleted successfully");
+    }
 
-    return documentService.getDeletedDocuments(email, sort);
-}
+    @GetMapping("/search")
+    public List<DocumentResponse> searchDocuments(
+            @RequestParam String keyword,
+            @RequestHeader("Authorization") String authHeader) {
 
-@PutMapping("/{id}/restore")
-public DocumentResponse restoreDocument(
-        @PathVariable Long id,
-        @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        String email = jwtService.extractEmail(token);
+        return documentService.searchDocuments(email, keyword);
+    }
 
-    String token = authHeader.substring(7);
-    String email = jwtService.extractEmail(token);
+    @PutMapping("/{id}")
+    public DocumentResponse renameDocument(
+            @PathVariable Long id,
+            @Valid @RequestBody RenameDocumentRequest request,
+            @RequestHeader("Authorization") String authHeader){
 
-    return documentService.restoreDocument(id, email);
-}
+        String token = authHeader.substring(7);
+        String email = jwtService.extractEmail(token);
 
-@DeleteMapping("/{id}/permanent")
-public ResponseEntity<String> permanentlyDeleteDocument(
-        @PathVariable Long id,
-        @RequestHeader("Authorization") String authHeader) {
+        return documentService.renameDocument(id, email, request.getNewName());
+    }
 
-    String token = authHeader.substring(7);
-    String email = jwtService.extractEmail(token);
+    @GetMapping("/{id}/metadata")
+    public DocumentResponse getDocument(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String authHeader) {
 
-    documentService.permanentlyDeleteDocument(id, email);
+        String token = authHeader.substring(7);
+        String email = jwtService.extractEmail(token);
 
-    return ResponseEntity.ok("Document permanently deleted");
-}
+        return documentService.getDocument(id, email);
+    }
 
-@PostMapping("/{id}/tags/{tagId}")
-public ResponseEntity<Void> assignTag(
-        @PathVariable Long id,
-        @PathVariable Long tagId,
-        @RequestHeader("Authorization") String authHeader) {
-    String token = authHeader.substring(7);
-    String email = jwtService.extractEmail(token);
-    tagService.assignTagToDocument(id, tagId, email);
-    return ResponseEntity.ok().build();
-}
+    @PostMapping("/{id}/share")
+    public ShareResponse shareDocument(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String authHeader) {
 
-@DeleteMapping("/{id}/tags/{tagId}")
-public ResponseEntity<Void> removeTag(
-        @PathVariable Long id,
-        @PathVariable Long tagId,
-        @RequestHeader("Authorization") String authHeader) {
-    String token = authHeader.substring(7);
-    String email = jwtService.extractEmail(token);
-    tagService.removeTagFromDocument(id, tagId, email);
-    return ResponseEntity.noContent().build();
-}
+        String token = authHeader.substring(7);
+        String email = jwtService.extractEmail(token);
 
+        return documentService.shareDocument(id, email);
+    }
+
+    @DeleteMapping("/{id}/share")
+    public ResponseEntity<String> revokeShare(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String authHeader) {
+
+        String token = authHeader.substring(7);
+        String email = jwtService.extractEmail(token);
+
+        documentService.revokeShare(id, email);
+        return ResponseEntity.ok("Share link revoked successfully");
+    }
+
+    @GetMapping("/share/{shareToken}")
+    public ResponseEntity<?> downloadSharedDocumentPublic(@PathVariable String shareToken) {
+        try {
+            DocumentDownloadResponse response = documentService.downloadSharedDocument(shareToken);
+            return ResponseEntity.ok(response);
+        } catch (com.builds.digidocs.exception.DocumentNotFoundException e) {
+            return ResponseEntity.status(404).body("Invalid or expired share token");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to retrieve shared document");
+        }
+    }
+
+    @PutMapping("/{id}/star")
+    public DocumentResponse toggleStar(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String authHeader) {
+
+        String token = authHeader.substring(7);
+        String email = jwtService.extractEmail(token);
+        return documentService.toggleStar(id, email);
+    }
+
+    @GetMapping("/download-zip")
+    public ResponseEntity<?> downloadMultipleAsZip(
+            @RequestParam List<Long> ids,
+            @RequestHeader("Authorization") String authHeader) {
+
+        String token = authHeader.substring(7);
+        String email = jwtService.extractEmail(token);
+
+        try {
+            Resource resource = documentService.downloadMultipleAsZip(ids, email);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"documents.zip\"")
+                    .header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION)
+                    .contentType(org.springframework.http.MediaType.parseMediaType("application/zip"))
+                    .body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to create zip file");
+        }
+    }
+
+    @GetMapping("/trash")
+    public List<DocumentResponse> getDeletedDocuments(
+            @RequestParam(defaultValue = "date") String sort,
+            @RequestHeader("Authorization") String authHeader) {
+
+        String token = authHeader.substring(7);
+        String email = jwtService.extractEmail(token);
+        return documentService.getDeletedDocuments(email, sort);
+    }
+
+    @PutMapping("/{id}/restore")
+    public DocumentResponse restoreDocument(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String authHeader) {
+
+        String token = authHeader.substring(7);
+        String email = jwtService.extractEmail(token);
+        return documentService.restoreDocument(id, email);
+    }
+
+    @DeleteMapping("/{id}/permanent")
+    public ResponseEntity<String> permanentlyDeleteDocument(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String authHeader) {
+
+        String token = authHeader.substring(7);
+        String email = jwtService.extractEmail(token);
+        documentService.permanentlyDeleteDocument(id, email);
+        return ResponseEntity.ok("Document permanently deleted");
+    }
+
+    @PostMapping("/{id}/tags/{tagId}")
+    public ResponseEntity<Void> assignTag(
+            @PathVariable Long id,
+            @PathVariable Long tagId,
+            @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        String email = jwtService.extractEmail(token);
+        tagService.assignTagToDocument(id, tagId, email);
+        return ResponseEntity.ok().build();
+    }
 }
