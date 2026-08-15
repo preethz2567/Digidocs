@@ -2,11 +2,13 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Bell, ChevronDown, User as UserIcon, LogOut } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
+import { useUiStore } from '../../store/uiStore';
 import './Navbar.css';
 
 export const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const { user, logout, fetchUser } = useAuthStore();
+  const { setCommandPaletteOpen } = useUiStore();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -44,7 +46,13 @@ export const Navbar: React.FC = () => {
           <span className="navbar__search-icon">
             <Search size={14} strokeWidth={2} color="#9ca3af" />
           </span>
-          <input type="text" placeholder="Search documents..." />
+          <input 
+            type="text" 
+            placeholder="Search documents... (Ctrl+K)" 
+            readOnly
+            onClick={() => setCommandPaletteOpen(true)}
+            style={{ cursor: 'pointer' }}
+          />
         </div>
       </div>
 
