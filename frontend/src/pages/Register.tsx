@@ -164,14 +164,19 @@ const Register: React.FC = () => {
             {...register('email')}
           />
 
-          <PasswordInput
-            id="password"
-            label="Password"
-            placeholder="••••••••"
-            autoComplete="new-password"
-            error={errors.password?.message}
-            {...register('password')}
-          />
+          <div style={{ marginBottom: '8px' }}>
+            <PasswordInput
+              id="password"
+              label="Password"
+              placeholder="••••••••"
+              autoComplete="new-password"
+              error={errors.password?.message}
+              {...register('password')}
+            />
+            <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px', marginLeft: '4px' }}>
+              Must be at least 6 characters long. We recommend using a mix of letters, numbers, and symbols.
+            </p>
+          </div>
 
           <PasswordInput
             id="confirmPassword"

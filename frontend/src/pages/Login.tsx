@@ -166,7 +166,18 @@ const Login: React.FC = () => {
             />
           </div>
 
-          <Button type="submit" isLoading={isSubmitting} fullWidth style={{ marginTop: 'var(--space-2)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px', marginTop: '12px' }}>
+            <input 
+              type="checkbox" 
+              id="remember" 
+              style={{ width: '16px', height: '16px', border: '1px solid #d1d5db', borderRadius: '4px', cursor: 'pointer' }} 
+            />
+            <label htmlFor="remember" style={{ marginLeft: '8px', fontSize: '14px', color: '#4b5563', cursor: 'pointer' }}>
+              Remember me for 30 days
+            </label>
+          </div>
+
+          <Button type="submit" isLoading={isSubmitting} fullWidth>
             {isSubmitting ? 'Signing in...' : 'Continue'}
           </Button>
         </form>
