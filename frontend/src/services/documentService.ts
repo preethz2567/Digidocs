@@ -2,8 +2,9 @@ import api from "../api/axios";
 import axios from "axios";
 
 // Axios instance without auth interceptor for public endpoints
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8081/api";
 const publicApi = axios.create({
-  baseURL: "http://localhost:8081/api",
+  baseURL: API_BASE_URL,
 });
 
 
@@ -26,11 +27,8 @@ const uploadDocument = async (file: File) => {
 };
 
 const downloadDocument = async (id: number) => {
-  const response = await api.get(`/documents/${id}`, {
-    responseType: "blob",
-  });
-
-  return response.data;
+  const response = await api.get(`/documents/${id}`);
+  return response.data; // { url, originalFileName }
 };
 
 const deleteDocument = async (id: number) => {
@@ -118,21 +116,11 @@ const documentService = {
 
 /**
  * Fetch a publicly shared document using its token.
- * Returns the file Blob and the filename parsed from Content-Disposition.
+ * Returns the presigned URL and the filename.
  */
-export const getSharedDocument = async (token: string): Promise<{ blob: Blob; filename: string }> => {
-  const response = await publicApi.get(`/documents/share/${token}`, {
-    responseType: "blob",
-  });
-
-  const disposition: string = response.headers["content-disposition"] || "";
-  let filename = "document";
-  const match = disposition.match(/filename\*?=['"]?(?:UTF-8'')?([^;"'\n]+)/i);
-  if (match && match[1]) {
-    filename = decodeURIComponent(match[1].trim());
-  }
-
-  return { blob: response.data, filename };
+export const getSharedDocument = async (token: string): Promise<{ url: string; originalFileName: string }> => {
+  const response = await publicApi.get(`/documents/share/${token}`);
+  return response.data; // { url, originalFileName }
 };
 
 export default documentService;
