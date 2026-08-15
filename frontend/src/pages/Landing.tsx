@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Shield, Zap, Share2 } from 'lucide-react';
 import './Landing.css';
+import heroGraphic from '../assets/hero-graphic.png';
 
 const Landing: React.FC = () => {
   return (
@@ -34,33 +35,7 @@ const Landing: React.FC = () => {
           </div>
         </div>
         <div className="landing-hero__graphic">
-          <svg className="svg-graphic anim-float" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-            {/* Geometric Grid Background */}
-            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#e5e7eb" strokeWidth="1"/>
-            </pattern>
-            <rect width="400" height="400" fill="url(#grid)" />
-            
-            {/* Central Monolith */}
-            <rect x="120" y="80" width="160" height="240" fill="#0d0d0d" stroke="#1d6ef7" strokeWidth="4" />
-            
-            {/* Data nodes */}
-            <rect x="80" y="120" width="40" height="40" fill="#1d6ef7" className="anim-pulse" />
-            <rect x="280" y="240" width="40" height="40" fill="#1d6ef7" className="anim-pulse" style={{ animationDelay: '1s' }} />
-            
-            {/* Connecting lines */}
-            <path d="M 0 140 H 80" stroke="#0d0d0d" strokeWidth="2" strokeDasharray="4 4" />
-            <path d="M 320 260 H 400" stroke="#0d0d0d" strokeWidth="2" strokeDasharray="4 4" />
-            
-            {/* Spinning reticle */}
-            <g className="anim-spin" style={{ transformOrigin: '200px 200px' }}>
-              <circle cx="200" cy="200" r="100" fill="none" stroke="#1d6ef7" strokeWidth="1" strokeDasharray="10 20" />
-              <rect x="198" y="90" width="4" height="20" fill="#0d0d0d" />
-              <rect x="198" y="290" width="4" height="20" fill="#0d0d0d" />
-              <rect x="90" y="198" width="20" height="4" fill="#0d0d0d" />
-              <rect x="290" y="198" width="20" height="4" fill="#0d0d0d" />
-            </g>
-          </svg>
+          <img src={heroGraphic} alt="Secure Vault Graphic" className="anim-float" style={{ width: '100%', height: 'auto', border: '1px solid #374151', display: 'block' }} />
         </div>
       </header>
 
@@ -96,6 +71,53 @@ const Landing: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* CTA Section */}
+      <section className="landing-cta">
+        <h2 className="landing-cta__title">Ready to secure your documents?</h2>
+        <p className="landing-cta__desc">Join thousands of enterprises leveraging our modern architecture.</p>
+        <Link to="/register" className="btn-primary" style={{ display: 'inline-flex', padding: '12px 32px', fontSize: '16px' }}>
+          Get Started Now
+        </Link>
+      </section>
+
+      {/* Footer */}
+      <footer className="landing-footer">
+        <div className="landing-footer__content">
+          <div className="landing-footer__brand">
+            <div className="landing-footer__logo-mark"></div>
+            <span style={{ fontSize: '18px', fontWeight: 700, color: '#fafafa', letterSpacing: '-0.02em' }}>Digidocs</span>
+            <p style={{ marginTop: '12px', color: '#9ca3af', fontSize: '14px', lineHeight: 1.5 }}>
+              Enterprise-grade document management.<br/>
+              Built for speed and strict compliance.
+            </p>
+          </div>
+          
+          <div className="landing-footer__links">
+            <div className="landing-footer__column">
+              <h4>Product</h4>
+              <a href="#features">Features</a>
+              <a href="#security">Security</a>
+              <a href="#">Integrations</a>
+            </div>
+            <div className="landing-footer__column">
+              <h4>Company</h4>
+              <a href="#">About</a>
+              <a href="#">Blog</a>
+              <a href="#">Careers</a>
+            </div>
+            <div className="landing-footer__column">
+              <h4>Legal</h4>
+              <a href="#">Privacy Policy</a>
+              <a href="#">Terms of Service</a>
+              <a href="#">Contact</a>
+            </div>
+          </div>
+        </div>
+        <div className="landing-footer__bottom">
+          &copy; {new Date().getFullYear()} Digidocs Inc. All rights reserved.
+        </div>
+      </footer>
     </div>
   );
 };
