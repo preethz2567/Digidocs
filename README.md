@@ -4,7 +4,7 @@
 
 DigiDocs is a modern, enterprise-grade document management system designed to make storing, finding, and sharing your files completely frictionless. Built with a robust Java/Spring Boot backend and a lightning-fast React frontend, DigiDocs provides a seamless, dynamic user experience with high performance.
 
-## 🌟 Key Features
+##  Key Features
 
 * **Advanced Document Management:** Upload, rename, star, and delete documents with ease.
 * **Intelligent Soft Deletion (Trash):** Accidental deletions are a thing of the past. Deleted files go to a recycle bin where they can be restored or permanently purged.
@@ -31,7 +31,7 @@ DigiDocs is a modern, enterprise-grade document management system designed to ma
 * **H2 Database** (Local Storage / Embedded)
 * **Maven** (Build Tool)
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 - Node.js (v18+)
@@ -58,7 +58,3 @@ DigiDocs is a modern, enterprise-grade document management system designed to ma
    npm run dev
    ```
 3. The application will start on `http://localhost:5173`.
-
-## 🤝 Contributing
-
-We welcome contributions! Please feel free to submit a Pull Request or open an Issue to discuss potential changes.
